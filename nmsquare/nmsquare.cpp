@@ -1,8 +1,8 @@
 #define LINE_READ_BUFFER_SIZE 512
-//#define G_NUM_THREADS 14
 
 #pragma warning(disable : 4996)
 
+#include <cmath>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -74,26 +74,30 @@ S_cell_index cell_index;
 S_global g;
 S_global data;
 
-static uint_fast32_t G_NUM_THREADS = 14;
-
 static std::mutex mlock;
-static uint_fast32_t G_B_DATA_CELLS = 6;
 
-static uint_fast32_t R_MAX = 4294967295;
-static unsigned long long int E_MAX = 18446744073709551615;
-
-static uint_fast32_t T_CYCLES_DIVIDER = 1;
-static std::string T_CYCLES_SYMBOL = "";
-static uint_fast32_t B_CYCLES_DIVIDER = 1000;
-static std::string B_CYCLES_SYMBOL = "K";
-static uint_fast32_t G_CYCLES_DIVIDER = 1000;
-static std::string G_CYCLES_SYMBOL = "M";
+static uint_fast32_t G_NUM_THREADS      = 14;
+static uint_fast32_t G_B_DATA_CELLS     = 6;
+static uint_fast32_t R_MAX              = 4294967295;
+static unsigned long long int E_MAX     = 18446744073709551615;
+std::string G_BLOCK_FILE_PATH_DEFAULT   = "block.dat";
+static uint_fast32_t T_CYCLES_DIVIDER   = 1;
+static std::string T_CYCLES_SYMBOL      = "";
+static uint_fast32_t B_CYCLES_DIVIDER   = 1000;
+static std::string B_CYCLES_SYMBOL      = "K";
+static uint_fast32_t G_CYCLES_DIVIDER   = 1000;
+static std::string G_CYCLES_SYMBOL      = "M";
 
 bool square(unsigned long long int x) {
     if (x > 0) {
         unsigned long long int sr = sqrt(x);
         return (sr * sr == x);
     } return false;
+}
+
+inline bool file_exists(const std::string& name) {
+    struct stat buffer;
+    return (stat(name.c_str(), &buffer) == 0);
 }
 
 std::vector<std::string> B_ReadLine(std::istream& str) {
@@ -183,7 +187,7 @@ bool B_ReadFromFile(std::vector<S_block>& block_vector, std::string path) {
             block_buffer.date =         stoi(cells_buffer[cell_index.b_date]);
             block_buffer.id =           stoi(cells_buffer[cell_index.b_id]);
             block_buffer.state =        stoi(cells_buffer[cell_index.b_state]);
-            block_buffer.time =            seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
+            block_buffer.time =         seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
 
             data.block[line_index] = block_buffer;
 
@@ -287,24 +291,33 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 int main()
 {
 reset:
-    std::cout << "[nmSquare]\n\nINIT  Threads:";
+    g.time = std::chrono::milliseconds::zero();
+    g.cycles = 0;
+
+    std::cout << "[nmSquare]\nINIT  Threads:";
     std::cin >> g.G_NUM_THREADS;
     if (g.G_NUM_THREADS == 0) {
         return 0;
     }
+    std::cout << "INIT  (" << g.G_BLOCK_FILE_PATH << "):";
+    std::cin >> g.G_BLOCK_FILE_PATH;
 
-start:
+    if (!file_exists(g.G_BLOCK_FILE_PATH)) {
+        std::cout << "INIT  " << g.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << G_BLOCK_FILE_PATH_DEFAULT <<"\n";
+        g.G_BLOCK_FILE_PATH = G_BLOCK_FILE_PATH_DEFAULT;
+    }
+
     std::cout << "DATA  read=" << g.G_BLOCK_FILE_PATH << "\n";
 
     B_ReadFromFile(g.block, g.G_BLOCK_FILE_PATH);
 
     if (data.block.size() > g.block.size()) {
-        std::wcout << "DATA  data larger than g.block, importing " << data.block.size() << " blocks...\n";
+        std::wcout << "DATA  update available, importing " << data.block.size() << " blocks...\n";
         g.block.resize(data.block.size());
 
         for (uint_fast32_t block_pointer = 1; block_pointer < data.block.size(); block_pointer++) {
-            if (g.block[block_pointer].state == 0) { 
-                g.block[block_pointer] = data.block[block_pointer]; 
+            if (g.block[block_pointer].state == 0) {
+                g.block[block_pointer] = data.block[block_pointer];
             }
         }
 
@@ -316,10 +329,20 @@ start:
     }
     else {
         long block_count = 0;
-        for (int i = 0; i < data.block.size(); i++) { 
-            if (data.block[i].state != 0) { block_count++; } }
+        for (int i = 0; i < data.block.size(); i++) {
+            if (data.block[i].state != 0) { block_count++; }
+        }
         std::wcout << "DATA  up to date, " << data.block.size() - 1 << " blocks in file, " << block_count << " completed\n";
     }
+
+start:
+    std::cout << "[NMS] g_time=" << g.time.count() <<
+        "s g_cycles=" << g.cycles << G_CYCLES_SYMBOL <<
+        " best=" << g.best.matches <<
+        " n=" << g.best.n <<
+        " m=" << g.best.m <<
+        " e=" << g.best.e <<
+        " r=" << g.best.r << "\n";
 
     std::cout << "INIT  Start: "; std::cin >> g.G_BLOCK_START;
 
@@ -339,12 +362,42 @@ start:
         " date=" << std::ctime(&g.date);
 
     for (int l = g.G_BLOCK_START; l < g.G_BLOCK_START + g.G_LIMIT; l++) {
-        S_block g_block;
-        g_block.id = l;
-        std::cout << "BLOCK [" << g_block.id << " of " << g.G_BLOCK_START + g.G_LIMIT - 1 <<
-            "] threads=" << g.G_NUM_THREADS << " running...\n";
         
+        
+        std::cout << "DATA  read=" << g.G_BLOCK_FILE_PATH << "\n";
+
+        B_ReadFromFile(g.block, g.G_BLOCK_FILE_PATH);
+
+        if (data.block.size() > g.block.size()) {
+            std::wcout << "DATA  update available, importing " << data.block.size() << " blocks...\n";
+            g.block.resize(data.block.size());
+
+            for (uint_fast32_t block_pointer = 1; block_pointer < data.block.size(); block_pointer++) {
+                if (g.block[block_pointer].state == 0) {
+                    g.block[block_pointer] = data.block[block_pointer];
+                }
+            }
+
+            long block_count = 0;
+            for (int i = 0; i < data.block.size(); i++) {
+                if (data.block[i].state != 0) { block_count++; }
+            }
+            std::wcout << "DATA  up to date, " << data.block.size() - 1 << " blocks in file, " << block_count << " completed\n";
+        }
+        else {
+            long block_count = 0;
+            for (int i = 0; i < data.block.size(); i++) {
+                if (data.block[i].state != 0) { block_count++; }
+            }
+            std::wcout << "DATA  up to date, " << data.block.size() - 1 << " blocks in file, " << block_count << " completed\n";
+        }
+
         if (g.block[l].state == 0) {
+            S_block g_block;
+            g_block.id = l;
+            std::cout << "BLOCK [" << g_block.id << " of " << g.G_BLOCK_START + g.G_LIMIT - 1 <<
+                "] threads=" << g.G_NUM_THREADS << " running...\n";
+
             g.block[g_block.id].thread.resize(g.G_NUM_THREADS);
             auto b_date = std::chrono::system_clock::now();
             g.block[g_block.id].date = std::chrono::system_clock::to_time_t(b_date);
@@ -369,44 +422,48 @@ start:
                 g.best = g.block[g_block.id].best;
             }
 
+            std::cout << "BLOCK [" << g_block.id << "] cycles=" << g.block[g_block.id].cycles << B_CYCLES_SYMBOL <<
+                " time=" << g.block[g_block.id].time.count() << 
+                "s date=" << std::ctime(&g.block[g_block.id].date);
+
+            std::cout << "BLOCK [" << g_block.id << "] best=" << g.block[g_block.id].best.matches <<
+                " n=" << g.block[g_block.id].best.n << 
+                " m=" << g.block[g_block.id].best.m << 
+                " e=" << g.block[g_block.id].best.e << 
+                " r=" << g.block[g_block.id].best.r << "\n";
+
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
-            g.time = g_total_time;
-        
-        std::cout << "BLOCK [" << g_block.id << "] cycles=" << g.block[g_block.id].cycles << B_CYCLES_SYMBOL <<
-            " time=" << g.block[g_block.id].time.count() << 
-            "s date=" << std::ctime(&g.block[g_block.id].date);
+            g.time += g_total_time;
 
-        std::cout << "BLOCK [" << g_block.id << "] best=" << g.block[g_block.id].best.matches <<
-            " n=" << g.block[g_block.id].best.n << 
-            " m=" << g.block[g_block.id].best.m << 
-            " e=" << g.block[g_block.id].best.e << 
-            " r=" << g.block[g_block.id].best.r << "\n";
+            std::cout << "END   time=" << g.time.count() << "s cycles=" << g.cycles << G_CYCLES_SYMBOL << "\n";
+            std::cout << "END   best=" << g.best.matches << " n=" << g.best.n << " m=" << g.best.m <<
+                " e=" << g.best.e << " r=" << g.best.r << "\n";
 
-        std::cout << "BEST  time=" << g.time.count() << 
-            "s cycles=" << g.cycles << G_CYCLES_SYMBOL <<
-            " best=" << g.best.matches << 
-            " n=" << g.best.n << 
-            " m=" << g.best.m <<
-            " e=" << g.best.e << 
-            " r=" << g.best.r << "\n";
+            std::cout << "BEST  time=" << g.time.count() << 
+                "s cycles=" << g.cycles << G_CYCLES_SYMBOL <<
+                " best=" << g.best.matches << 
+                " n=" << g.best.n << 
+                " m=" << g.best.m <<
+                " e=" << g.best.e << 
+                " r=" << g.best.r << "\n";
 
-        bool update = 0;
+            bool update = 0;
 
-        if (g.block.size() > data.block.size()) {
-            data.block.resize(g.block.size());
-            update = 1;
-        }
-        else {
-            g.block.resize(data.block.size());
-        }
-
-        for (uint_fast32_t block_pointer = 1; block_pointer < g.block.size(); block_pointer++) {
-            if (data.block[block_pointer].state == 0 && g.block[block_pointer].state != 0) {
-                data.block[block_pointer] = g.block[block_pointer];
+            if (g.block.size() > data.block.size()) {
+                data.block.resize(g.block.size());
                 update = 1;
             }
+            else {
+                g.block.resize(data.block.size());
+            }
+
+            for (uint_fast32_t block_pointer = 1; block_pointer < g.block.size(); block_pointer++) {
+                if (data.block[block_pointer].state == 0 && g.block[block_pointer].state != 0) {
+                    data.block[block_pointer] = g.block[block_pointer];
+                    update = 1;
+                }
         }
         if (update) { 
             std::cout << "DATA  write=" << g.G_BLOCK_FILE_PATH << "\n";
@@ -419,17 +476,6 @@ start:
             std::cout << "BLOCK r=" << l << " already complete, skipping...\n";
         }
     }
-
-    std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
-
-    g.time = g_total_time;
- 
-    
-
-    std::cout << "END   time=" << g.time.count() << "s cycles=" << g.cycles << G_CYCLES_SYMBOL << "\n";
-    std::cout << "END   best=" << g.best.matches << " n=" << g.best.n << " m=" << g.best.m <<
-        " e=" << g.best.e << " r=" << g.best.r << "\n";
 
     goto start;
 
