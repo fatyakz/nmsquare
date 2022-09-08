@@ -1,5 +1,5 @@
 #define LINE_READ_BUFFER_SIZE 512
-#define G_NUM_THREADS 14
+//#define G_NUM_THREADS 14
 
 #pragma warning(disable : 4996)
 
@@ -53,6 +53,7 @@ public:
     uint_fast32_t                   G_BLOCK_START;
     uint_fast32_t                   G_LIMIT;
     std::string                     G_BLOCK_FILE_PATH = "block.dat";
+    uint_fast32_t                   G_NUM_THREADS;
 };
 struct S_cell_index {
     uint_fast32_t _cell_count = 10;
@@ -72,6 +73,8 @@ struct S_cell_index {
 S_cell_index cell_index;
 S_global g;
 S_global data;
+
+static uint_fast32_t G_NUM_THREADS = 14;
 
 static std::mutex mlock;
 static uint_fast32_t G_B_DATA_CELLS = 6;
@@ -131,11 +134,14 @@ bool B_WriteToFile(std::vector<S_block> block_vector, std::string path) {
             line_buffer[cell_index.b_time] =        std::to_string(block_vector[block_index].time.count());
             
             file_out << line_buffer[0];
+
             for (uint_fast32_t cell_pointer = 1; cell_pointer < cell_index._cell_count; cell_pointer++) {
                 file_out << ",";
                 file_out << line_buffer[cell_pointer];
             }
+
             if (block_index < block_vector.size() - 1) { file_out << "\n"; }
+
             line_buffer.resize(0);
         }
     }
@@ -280,7 +286,12 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 
 int main()
 {
-    std::cout << "[nmSquare]\n\n";
+reset:
+    std::cout << "[nmSquare]\n\nINIT  Threads:";
+    std::cin >> g.G_NUM_THREADS;
+    if (g.G_NUM_THREADS == 0) {
+        return 0;
+    }
 
 start:
     std::cout << "DATA  read=" << g.G_BLOCK_FILE_PATH << "\n";
@@ -313,7 +324,7 @@ start:
     std::cout << "INIT  Start: "; std::cin >> g.G_BLOCK_START;
 
     if (g.G_BLOCK_START == 0) {
-        return 0;
+        goto reset;
     }
 
     std::cout << "INIT  Blocks: "; std::cin >> g.G_LIMIT; std::cout;
@@ -331,21 +342,21 @@ start:
         S_block g_block;
         g_block.id = l;
         std::cout << "BLOCK [" << g_block.id << " of " << g.G_BLOCK_START + g.G_LIMIT - 1 <<
-            "] threads=" << G_NUM_THREADS << " running...\n";
+            "] threads=" << g.G_NUM_THREADS << " running...\n";
         
         if (g.block[l].state == 0) {
-            g.block[g_block.id].thread.resize(G_NUM_THREADS);
+            g.block[g_block.id].thread.resize(g.G_NUM_THREADS);
             auto b_date = std::chrono::system_clock::now();
             g.block[g_block.id].date = std::chrono::system_clock::to_time_t(b_date);
 
             std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
 
-            std::thread thr[G_NUM_THREADS];
+            std::vector<std::thread> thr(g.G_NUM_THREADS);
 
-            for (uint_fast32_t g_thread_offset = 0; g_thread_offset < G_NUM_THREADS; g_thread_offset++) {
-                thr[g_thread_offset] = std::thread(thr_SingleE, g_block.id, g_thread_offset, G_NUM_THREADS);
+            for (uint_fast32_t g_thread_offset = 0; g_thread_offset < g.G_NUM_THREADS; g_thread_offset++) {
+                thr[g_thread_offset] = std::thread(thr_SingleE, g_block.id, g_thread_offset, g.G_NUM_THREADS);
             }
-            for (uint_fast32_t g_thread_id = 0; g_thread_id < G_NUM_THREADS; g_thread_id++) {
+            for (uint_fast32_t g_thread_id = 0; g_thread_id < g.G_NUM_THREADS; g_thread_id++) {
                 thr[g_thread_id].join();
             }
 
