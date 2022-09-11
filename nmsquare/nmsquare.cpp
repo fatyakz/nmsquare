@@ -634,7 +634,7 @@ start:
     if (global.block.size() < (global.G_BLOCK_START + global.G_LIMIT)) { global.block.resize(global.G_BLOCK_START + global.G_LIMIT); }
 
     rmw.TimeStamp();
-    std::wcout << "BLOCK [" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
+    std::wcout << "START [" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
     for (uint_fast32_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
@@ -696,8 +696,6 @@ start:
                 " cycles="  << global.block[g_block.id].cycles << global.var.B_CYCLES_SYMBOL <<
                 " time="    << global.block[g_block.id].time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
                 " cps="    << cps << global.var.B_CYCLES_SYMBOL << "\n";
-
-            rmw.Stat();
 
             global.block[g_block.id].state = 2;
 
