@@ -177,8 +177,8 @@ void B_WriteToFile(std::vector<S_block> block_vector, std::string path) {
 }
 
 template <typename T>
-auto seconds_to_duration(T seconds) { 
-    return std::chrono::duration<T, std::ratio<1>>(seconds); 
+auto seconds_to_duration(T seconds) {
+    return std::chrono::duration<T, std::ratio<1>>(seconds);
 }
 
 long long getFileSize(std::string path) {
