@@ -261,7 +261,6 @@ public:
 
         for (unsigned long long int i = 0; i < file.block.size(); i++) {
 
-
             if (file.block[i].state != global.block[i].state) {
                 if (file.block[i].state > global.block[i].state) {
                     global.block[i] = file.block[i];
@@ -592,7 +591,8 @@ reset:
 
     rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
-    rmw.Stat();
+
+pending:
 
     if (global.rmw.rmw_pending > 0) {
         std::string clear_pending = "n";
@@ -612,13 +612,17 @@ reset:
             rmw.TimeStamp();
             std::cout << "INIT  All pending blocks reset to incomplete\n";
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
-            
+
+            rmw.Stat();
+            goto pending;
         }
     }
 
 start:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
+
+    rmw.Stat();
 
     rmw.TimeStamp();
     std::cout << "INIT  Start:"; std::cin >> global.G_BLOCK_START;
@@ -644,7 +648,7 @@ start:
         
         rmw.Stat();
 
-        if (global.block[id].state == 0) {
+        if (file.block[id].state == 0) {
             S_block g_block;
             g_block.id = id;
 
