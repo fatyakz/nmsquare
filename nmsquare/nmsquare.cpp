@@ -69,6 +69,7 @@ public:
     std::string                     G_BLOCK_FILE_PATH = "block.dat";
     uint_fast32_t                   G_NUM_THREADS;
     std::string                     G_SYSTEM_NAME;
+    uint_fast32_t                   G_MODE; // 0 for normal, 1 for nines
 };
 struct S_cell_index {
     uint_fast32_t                   _cell_count = 11;
@@ -404,6 +405,115 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
     return t_thread;
 }
 
+static S_thread thr_Nines(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
+    unsigned long long int A, B, C, D, E, F, G, H, I;
+    unsigned long long int t_cycles = 0, t_NM_limit = 0;
+
+    uint_fast32_t t_matches = 0;
+
+    S_thread t_thread{};
+    t_thread.best.matches = 0;
+    t_thread.id = t_E;
+    t_thread.offset = t_offset;
+    t_thread.step = t_step;
+
+    E = t_E * t_E;
+    t_NM_limit = E - 1;
+
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    for (unsigned long long int lN = 1; lN < t_NM_limit; lN++) {
+        for (unsigned long long int lM = t_offset + 1; lM < t_NM_limit; lM += t_step) {
+            if (lN == lM) {
+                goto end;
+            }
+            if (lN + lM >= E) {
+                break;
+            }
+
+            A = E + lN;
+            if (square(A) != true) { goto end; }
+            
+            t_matches++;
+            B = E - lN - lM;
+            if (square(B) != true) { goto end; }
+
+            t_matches++;
+            C = E + lM;
+            if (square(C) != true) { goto end; }
+
+            t_matches++;
+            D = E - lN + lM;
+            if (square(D) != true) { goto end; }
+
+            t_matches++;
+            F = E + lN - lM;
+            if (square(F) != true) { goto end; }
+
+            t_matches++;
+            G = E - lM;
+            if (square(G) != true) { goto end; }
+
+            t_matches++;
+            H = E + lN + lM;
+            if (square(H) != true) { goto end; }
+
+            t_matches++;
+            I = E - lN;
+            if (square(I) != true) { goto end; }
+
+            t_matches++;
+
+end:
+            t_cycles++;
+            if (t_matches >= t_thread.best.matches) {
+                t_thread.best.matches = t_matches + 1;
+                t_thread.best.e = E;
+                t_thread.best.n = lN;
+                t_thread.best.m = lM;
+                t_thread.best.r = t_E;
+            }
+
+            if (t_thread.best.matches >= global.block[t_E].best.matches) {
+                global.block[t_E].best = t_thread.best;
+            }
+
+            t_matches = 0;
+        }
+    }
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+    auto t_date = std::chrono::system_clock::now();
+    t_thread.date = std::chrono::system_clock::to_time_t(t_date);
+    t_cycles /= T_CYCLES_DIVIDER;
+    t_thread.cycles = t_cycles;
+    t_thread.time = t_time;
+
+    mlock.lock();
+    global.block[t_E].cycles += t_thread.cycles / B_CYCLES_DIVIDER;
+    global.block[t_E].thread[t_offset] = t_thread;
+    global.block[t_E].id = t_E;
+    global.block[t_E].state = 2;
+
+    TimeStamp();
+    double cps = (double)t_thread.cycles / t_thread.time.count();
+    //std::cout << std::fixed;
+    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
+        " cycles=" << global.block[t_E].thread[t_offset].cycles << T_CYCLES_SYMBOL <<
+        " t=" << global.block[t_E].thread[t_offset].time.count() <<
+        " best=" << global.block[t_E].thread[t_offset].best.matches <<
+        " n=" << global.block[t_E].thread[t_offset].best.n <<
+        " m=" << global.block[t_E].thread[t_offset].best.m <<
+        " e=" << global.block[t_E].thread[t_offset].best.e <<
+        " r=" << global.block[t_E].thread[t_offset].best.r <<
+        " cps=" << cps / B_CYCLES_DIVIDER << B_CYCLES_SYMBOL <<
+        "\n";
+    mlock.unlock();
+
+    return t_thread;
+}
+
 int main()
 {
 reset:
@@ -417,6 +527,11 @@ reset:
     if (global.G_NUM_THREADS == 0) {
         return 0;
     }
+
+    TimeStamp();
+    std::cout << "INIT  Mode (0=default, 1=nines):";
+    std::cin >> global.G_MODE;
+
 
     TimeStamp();
     std::cout << "INIT  System name:";
@@ -457,6 +572,7 @@ reset:
     }
 
 start:
+    
     TimeStamp();
     std::cout << "INIT  Start:"; std::cin >> global.G_BLOCK_START;
 
@@ -500,11 +616,21 @@ start:
 
             std::vector<std::thread> thr(global.G_NUM_THREADS);
 
-            for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
-                thr[g_thread_offset] = std::thread(thr_SingleE, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+            if (global.G_MODE == 0) {
+                for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                    thr[g_thread_offset] = std::thread(thr_SingleE, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+                }
+                for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                    thr[g_thread_id].join();
+                }
             }
-            for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
-                thr[g_thread_id].join();
+            if (global.G_MODE == 1) {
+                for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                    thr[g_thread_offset] = std::thread(thr_Nines, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+                }
+                for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                    thr[g_thread_id].join();
+                }
             }
 
             std::chrono::high_resolution_clock::time_point b2 = std::chrono::high_resolution_clock::now();
