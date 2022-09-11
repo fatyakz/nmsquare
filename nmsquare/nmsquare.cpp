@@ -177,6 +177,10 @@ void B_WriteToFile(std::vector<S_block> block_vector, std::string path) {
     return;
 }
 
+void testprint(std::string text) {
+    std::cout << text;
+}
+
 template <typename T>
 auto seconds_to_duration(T seconds) {
     return std::chrono::duration<T, std::ratio<1>>(seconds);
@@ -516,13 +520,15 @@ end:
 
 int main()
 {
+    const auto processor_count = std::thread::hardware_concurrency();
+
 reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
     std::cout << "[nmSquare]\n";
     TimeStamp(); 
-    std::cout << "INIT  Threads:";
+    std::cout << "INIT  Threads (" << processor_count << " cores):";
     std::cin >> global.G_NUM_THREADS;
     if (global.G_NUM_THREADS == 0) {
         return 0;
