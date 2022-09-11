@@ -66,7 +66,7 @@ public:
     S_best                          best = {};
     uint_fast32_t                   G_BLOCK_START;
     uint_fast32_t                   G_LIMIT;
-    std::string                     G_BLOCK_FILE_PATH = "\\\\192.168.0.209\\nmsquare\\block.dat";
+    std::string                     G_BLOCK_FILE_PATH = "block.dat";
     uint_fast32_t                   G_NUM_THREADS;
     std::string                     G_SYSTEM_NAME;
 };
@@ -98,7 +98,7 @@ static uint_fast32_t G_NUM_THREADS      = 14;
 static uint_fast32_t G_B_DATA_CELLS     = 6;
 static uint_fast32_t R_MAX              = 4294967295;
 static unsigned long long int E_MAX     = 18446744073709551615;
-std::string G_BLOCK_FILE_PATH_DEFAULT   = "\\\\192.168.0.209\\nmsquare\\block.dat";
+std::string G_BLOCK_FILE_PATH_DEFAULT   = "block.dat";
 static uint_fast32_t T_CYCLES_DIVIDER   = 1;
 static std::string T_CYCLES_SYMBOL      = "";
 static uint_fast32_t B_CYCLES_DIVIDER   = 1000000;
@@ -216,16 +216,16 @@ S_rmw B_ReadFromFile(std::string path, std::vector<S_block> &target_block) {
         std::istringstream csv_buffer(line_buffer);
         std::vector<std::string> cells_buffer = B_ReadLine(csv_buffer);
 
-        block_buffer[line_index].best.n = stoi(cells_buffer[cell_index.b_n]);
-        block_buffer[line_index].best.m = stoi(cells_buffer[cell_index.b_m]);
-        block_buffer[line_index].best.e = stoi(cells_buffer[cell_index.b_e]);
-        block_buffer[line_index].best.r = stoi(cells_buffer[cell_index.b_r]);
+        block_buffer[line_index].best.n =       stoi(cells_buffer[cell_index.b_n]);
+        block_buffer[line_index].best.m =       stoi(cells_buffer[cell_index.b_m]);
+        block_buffer[line_index].best.e =       stoi(cells_buffer[cell_index.b_e]);
+        block_buffer[line_index].best.r =       stoi(cells_buffer[cell_index.b_r]);
         block_buffer[line_index].best.matches = stoi(cells_buffer[cell_index.b_matches]);
-        block_buffer[line_index].cycles = stol(cells_buffer[cell_index.b_cycles]);
-        block_buffer[line_index].date = stoi(cells_buffer[cell_index.b_date]);
-        block_buffer[line_index].id = stoi(cells_buffer[cell_index.b_id]);
-        block_buffer[line_index].state = stoi(cells_buffer[cell_index.b_state]);
-        block_buffer[line_index].time = seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
+        block_buffer[line_index].cycles =       stol(cells_buffer[cell_index.b_cycles]);
+        block_buffer[line_index].date =         stoi(cells_buffer[cell_index.b_date]);
+        block_buffer[line_index].id =           stoi(cells_buffer[cell_index.b_id]);
+        block_buffer[line_index].state =        stoi(cells_buffer[cell_index.b_state]);
+        block_buffer[line_index].time =         seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
         
         std::string sys_name = cells_buffer[cell_index.b_system_name];
 
@@ -245,9 +245,6 @@ S_rmw B_ReadFromFile(std::string path, std::vector<S_block> &target_block) {
     return read_rmw;
 }
 static void ReadMergeWrite(std::string path) {
-    TimeStamp();
-    std::cout << "RMW   read  <- " << path << "\n";
-
     global.rmw = B_ReadFromFile(path, file.block);
 
     if (file.block.size() > global.block.size()) {
@@ -257,8 +254,11 @@ static void ReadMergeWrite(std::string path) {
         file.block.resize(global.block.size());
     }
 
-    global.rmw.rmw_reads = 0; global.rmw.rmw_writes = 0;
-    global.rmw.rmw_incomplete = 0; global.rmw.rmw_pending = 0; global.rmw.rmw_completed = 0;
+    global.rmw.rmw_reads        = 0; 
+    global.rmw.rmw_writes       = 0;
+    global.rmw.rmw_incomplete   = 0; 
+    global.rmw.rmw_pending      = 0;     
+    global.rmw.rmw_completed    = 0;
 
     for (unsigned long long int i = 0; i < file.block.size(); i++) {
         
@@ -276,14 +276,14 @@ static void ReadMergeWrite(std::string path) {
 
         if (global.block[i].best.matches >= global.best.matches) { global.best = global.block[i].best; }
 
-        if (file.block[i].state == 0) { global.rmw.rmw_incomplete += 1; }
-        if (file.block[i].state == 1) { global.rmw.rmw_pending += 1; }
-        if (file.block[i].state == 2) { global.rmw.rmw_completed += 1; }
+        if (file.block[i].state == 0) { global.rmw.rmw_incomplete   += 1; }
+        if (file.block[i].state == 1) { global.rmw.rmw_pending      += 1; }
+        if (file.block[i].state == 2) { global.rmw.rmw_completed    += 1; }
     }
     TimeStamp();
-    std::cout << "RMW   " <<
-        "reads="         << global.rmw.rmw_reads <<
-        " writes="       << global.rmw.rmw_writes <<
+    std::cout << 
+        "FILE  " << "<-" <<
+        " read="         << global.rmw.rmw_reads <<
         " blocks="       << global.rmw.rmw_file_blocks - 1 <<
         " size="         << global.rmw.rmw_file_size / G_FILESIZE_DIVIDER << G_FILESIZE_SYMBOL <<
         " complete="     << global.rmw.rmw_completed <<
@@ -291,20 +291,22 @@ static void ReadMergeWrite(std::string path) {
         " incomplete="   << global.rmw.rmw_incomplete - 1 << "\n";
 
     TimeStamp();
-    std::cout << "RMW   write -> " << path << "\n";
+    std::cout << "FILE  write=" << global.rmw.rmw_writes << " -> " << path << " as [" << global.G_SYSTEM_NAME << "]\n";
     B_WriteToFile(file.block, path);
 
 
-    double cps = (double)global.cycles / global.time.count();
+    double cps = ((double)global.cycles * G_CYCLES_DIVIDER) / global.time.count();
     TimeStamp();
-    std::cout << "NMS   g_time=" << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
-        " g_cycles=" << global.cycles << G_CYCLES_SYMBOL <<
-        " best=" << global.best.matches <<
-        " n=" << global.best.n <<
-        " m=" << global.best.m <<
-        " e=" << global.best.e <<
-        " r=" << global.best.r << 
-        " cps=" << cps << G_CYCLES_SYMBOL << " cp/s\n";
+    std::cout << 
+        "STAT " << 
+        " time="  << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
+        " cycles="  << global.cycles << G_CYCLES_SYMBOL <<
+        " cps=" << cps << B_CYCLES_SYMBOL <<
+        " best="    << global.best.matches <<
+        " n="       << global.best.n <<
+        " m="       << global.best.m <<
+        " e="       << global.best.e <<
+        " r="       << global.best.r << "\n";
 }
 
 
@@ -386,8 +388,8 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 
     TimeStamp();
     double cps = (double)t_thread.cycles / t_thread.time.count();
-    std::cout << std::fixed;
-    std::cout << "THRD  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
+    //std::cout << std::fixed;
+    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
         " cycles=" << global.block[t_E].thread[t_offset].cycles << T_CYCLES_SYMBOL <<
         " t=" << global.block[t_E].thread[t_offset].time.count() <<
         " best=" << global.block[t_E].thread[t_offset].best.matches <<
@@ -395,7 +397,7 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
         " m=" << global.block[t_E].thread[t_offset].best.m <<
         " e=" << global.block[t_E].thread[t_offset].best.e <<
         " r=" << global.block[t_E].thread[t_offset].best.r <<
-        " cps=" << cps <<
+        " cps=" << cps / B_CYCLES_DIVIDER << B_CYCLES_SYMBOL <<
         "\n";
     mlock.unlock();
 
@@ -471,8 +473,7 @@ start:
     if (global.block.size() < (global.G_BLOCK_START + global.G_LIMIT)) { global.block.resize(global.G_BLOCK_START + global.G_LIMIT); }
 
     TimeStamp();
-    std::wcout << "BLOCK " << global.G_BLOCK_START << " -> " << global.G_BLOCK_START + global.G_LIMIT - 1 <<
-        " date=" << std::ctime(&global.date);
+    std::wcout << "BLOCK [" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
     for (int l = global.G_BLOCK_START; l < global.G_BLOCK_START + global.G_LIMIT; l++) {
         ReadMergeWrite(global.G_BLOCK_FILE_PATH);
@@ -488,7 +489,7 @@ start:
 
             TimeStamp();
             std::cout << "BLOCK [" << g_block.id << " of " << global.G_BLOCK_START + global.G_LIMIT - 1 <<
-                "] threads=" << global.G_NUM_THREADS << " running...\n";
+                "] threads=" << global.G_NUM_THREADS << " flagged as PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
             auto b_date = std::chrono::system_clock::now();
@@ -514,42 +515,20 @@ start:
                 global.best = global.block[g_block.id].best;
             }
 
+            TimeStamp();
+            double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
+            std::cout << "BLOCK [" << g_block.id << "] flagged as COMPLETE" << 
+                " cycles="  << global.block[g_block.id].cycles << B_CYCLES_SYMBOL <<
+                " time="    << global.block[g_block.id].time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
+                " cps="    << cps << B_CYCLES_SYMBOL << "\n";
+
             global.block[l].state = 2;
-
-            ReadMergeWrite(global.G_BLOCK_FILE_PATH);
-
-            double cps = (double)g_block.cycles / g_block.time.count();
-            TimeStamp();
-            std::cout << "BLOCK [" << g_block.id << "] cycles=" << global.block[g_block.id].cycles << B_CYCLES_SYMBOL <<
-                " time=" << global.block[g_block.id].time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
-                " date=" << std::ctime(&global.block[g_block.id].date);
-            TimeStamp();
-            std::cout << "BLOCK [" << g_block.id << "] best=" << global.block[g_block.id].best.matches <<
-                " n=" << global.block[g_block.id].best.n << 
-                " m=" << global.block[g_block.id].best.m << 
-                " e=" << global.block[g_block.id].best.e << 
-                " r=" << global.block[g_block.id].best.r << 
-                " cps=" << cps << B_CYCLES_DIVIDER << " cp/s" <<
-                "\n";
 
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
             global.time += g_total_time;
-            TimeStamp();
-            std::cout << "END   time=" << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL << " cycles=" << global.cycles << G_CYCLES_SYMBOL << "\n";
-            TimeStamp();
-            std::cout << "END   best=" << global.best.matches << " n=" << global.best.n << " m=" << global.best.m <<
-                " e=" << global.best.e << " r=" << global.best.r << "\n";
 
-            TimeStamp();
-            std::cout << "BEST  time=" << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
-                " cycles=" << global.cycles << G_CYCLES_SYMBOL <<
-                " best=" << global.best.matches << 
-                " n=" << global.best.n << 
-                " m=" << global.best.m <<
-                " e=" << global.best.e << 
-                " r=" << global.best.r << "\n";
         } 
         else {
             if (global.block[l].state == 1) {
@@ -562,6 +541,8 @@ start:
             }
         }
     }
+    ReadMergeWrite(global.G_BLOCK_FILE_PATH);
+
     goto start;
 
     return 0;
