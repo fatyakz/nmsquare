@@ -20,11 +20,11 @@
 
 struct S_best {
 public:
-    uint_fast32_t         matches;
-    uint_fast32_t         n;
-    uint_fast32_t         m;
-    uint_fast32_t         e;
-    uint_fast32_t         r;
+    uint_fast32_t                   matches;
+    uint_fast32_t                   n;
+    uint_fast32_t                   m;
+    uint_fast32_t                   e;
+    uint_fast32_t                   r;
 };
 struct S_thread {
 public:
@@ -44,17 +44,17 @@ public:
     unsigned long long int          cycles;
     S_best                          best = {};
     std::vector<S_thread>           thread;
-    uint_fast32_t                   state; //0=incomplete 1=running 2=finished
+    uint_fast32_t                   state; 
     std::string                     system_name;
 };
 struct S_rmw {
-    uint_fast32_t rmw_reads;
-    uint_fast32_t rmw_writes;
-    uint_fast32_t rmw_file_size;
-    uint_fast32_t rmw_file_blocks;
-    uint_fast32_t rmw_incomplete;
-    uint_fast32_t rmw_pending;
-    uint_fast32_t rmw_completed;
+    uint_fast32_t                   rmw_reads;
+    uint_fast32_t                   rmw_writes;
+    uint_fast32_t                   rmw_file_size;
+    uint_fast32_t                   rmw_file_blocks;
+    uint_fast32_t                   rmw_incomplete;
+    uint_fast32_t                   rmw_pending;
+    uint_fast32_t                   rmw_completed;
 };
 struct S_global {
 public:
@@ -71,19 +71,19 @@ public:
     std::string                     G_SYSTEM_NAME;
 };
 struct S_cell_index {
-    uint_fast32_t _cell_count = 11;
+    uint_fast32_t                   _cell_count = 11;
 
-    uint_fast32_t b_state = 0;
-    uint_fast32_t b_id = 1;
-    uint_fast32_t b_time = 2;
-    uint_fast32_t b_date = 3;
-    uint_fast32_t b_cycles = 4;
-    uint_fast32_t b_n = 5;
-    uint_fast32_t b_m = 6;
-    uint_fast32_t b_e = 7;
-    uint_fast32_t b_r = 8;
-    uint_fast32_t b_matches = 9;
-    uint_fast32_t b_system_name = 10;
+    uint_fast32_t                   b_state = 0;
+    uint_fast32_t                   b_id = 1;
+    uint_fast32_t                   b_time = 2;
+    uint_fast32_t                   b_date = 3;
+    uint_fast32_t                   b_cycles = 4;
+    uint_fast32_t                   b_n = 5;
+    uint_fast32_t                   b_m = 6;
+    uint_fast32_t                   b_e = 7;
+    uint_fast32_t                   b_r = 8;
+    uint_fast32_t                   b_matches = 9;
+    uint_fast32_t                   b_system_name = 10;
 };
 
 S_cell_index    cell_index;
@@ -107,7 +107,7 @@ static std::string G_FILESIZE_SYMBOL    = "kb";
 void TimeStamp() {
     char timestamp[50]{ 0 };
     std::time_t time = std::time(nullptr);
-    std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
+    std::strftime(timestamp, 30, "[%H:%M:%S] ", std::localtime(&time));
     std::cout << timestamp;
 }
 
@@ -278,7 +278,7 @@ static void ReadMergeWrite(std::string path) {
     if (global.rmw.rmw_reads > 0) {
         TimeStamp();
         std::cout <<
-            "READ  " <<
+            "READ " <<
             " reads=" << global.rmw.rmw_reads <<
             " blocks=" << global.rmw.rmw_file_blocks - 1 <<
             " size=" << global.rmw.rmw_file_size / G_FILESIZE_DIVIDER << G_FILESIZE_SYMBOL <<
@@ -475,15 +475,15 @@ start:
     TimeStamp();
     std::wcout << "BLOCK [" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
-    for (uint_fast32_t l = global.G_BLOCK_START; l < global.G_BLOCK_START + global.G_LIMIT; l++) {
+    for (uint_fast32_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
         ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         
-        if (global.block[l].state == 0) {
+        if (global.block[id].state == 0) {
             S_block g_block;
-            g_block.id = l;
+            g_block.id = id;
 
-            global.block[l].state = 1;
-            global.block[l].system_name = global.G_SYSTEM_NAME;
+            global.block[g_block.id].state = 1;
+            global.block[g_block.id].system_name = global.G_SYSTEM_NAME;
 
             ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
@@ -492,6 +492,7 @@ start:
                 "] threads=" << global.G_NUM_THREADS << " flagged as PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
+
             auto b_date = std::chrono::system_clock::now();
             global.block[g_block.id].date = std::chrono::system_clock::to_time_t(b_date);
 
@@ -522,7 +523,7 @@ start:
                 " time="    << global.block[g_block.id].time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
                 " cps="    << cps << B_CYCLES_SYMBOL << "\n";
 
-            global.block[l].state = 2;
+            global.block[g_block.id].state = 2;
 
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
@@ -531,13 +532,13 @@ start:
 
         } 
         else {
-            if (global.block[l].state == 1) {
+            if (global.block[id].state == 1) {
                 TimeStamp();
-                std::cout << "BLOCK [" << l << "] pending (" << global.block[l].system_name << ") skipping...\n";
+                std::cout << "BLOCK [" << id << "] pending (" << global.block[id].system_name << ") skipping...\n";
             }
-            if (global.block[l].state == 2) {
+            if (global.block[id].state == 2) {
                 TimeStamp();
-                std::cout << "BLOCK [" << l << "] completed (" << global.block[l].system_name << ") skipping...\n";
+                std::cout << "BLOCK [" << id << "] completed (" << global.block[id].system_name << ") skipping...\n";
             }
         }
     }
