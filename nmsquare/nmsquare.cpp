@@ -592,6 +592,8 @@ reset:
 
     rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
+    rmw.Stat();
+
     if (global.rmw.rmw_pending > 0) {
         std::string clear_pending = "n";
 
@@ -610,7 +612,7 @@ reset:
             rmw.TimeStamp();
             std::cout << "INIT  All pending blocks reset to incomplete\n";
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
-            goto reset;
+            
         }
     }
 
