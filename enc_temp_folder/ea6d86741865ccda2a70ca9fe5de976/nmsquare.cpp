@@ -295,15 +295,7 @@ public:
         }
 
         if (global.rmw.rmw_writes > 0 || global.rmw.rmw_reads > 0) {
-
-            double cps = 0;
-            if (((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count() > 0) {
-                cps = ((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count();
-            }
-            else {
-                cps = 0;
-            }
-
+            double cps = ((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count();
             TimeStamp();
             std::cout <<
                 "STAT " <<
