@@ -101,9 +101,9 @@ struct S_cell_index {
 };
 
 
-S_cell_index    cell_index;
-S_global        global;
-S_global        file;
+    S_cell_index    cell_index;
+    S_global        global;
+    S_global        file;
 
 class C_rmw {
 public:
@@ -162,19 +162,20 @@ public:
             std::vector<std::string> line_buffer;
 
             for (uint_fast32_t block_index = 0; block_index < block_vector.size(); block_index++) {
+
                 line_buffer.resize(cell_index._cell_count);
 
-                line_buffer[cell_index.b_cycles] = std::to_string(block_vector[block_index].cycles);
-                line_buffer[cell_index.b_date] = std::to_string(block_vector[block_index].date);
-                line_buffer[cell_index.b_n] = std::to_string(block_vector[block_index].best.n);
-                line_buffer[cell_index.b_m] = std::to_string(block_vector[block_index].best.m);
-                line_buffer[cell_index.b_e] = std::to_string(block_vector[block_index].best.e);
-                line_buffer[cell_index.b_r] = std::to_string(block_vector[block_index].best.r);
-                line_buffer[cell_index.b_matches] = std::to_string(block_vector[block_index].best.matches);
-                line_buffer[cell_index.b_id] = std::to_string(block_vector[block_index].id);
-                line_buffer[cell_index.b_state] = std::to_string(block_vector[block_index].state);
-                line_buffer[cell_index.b_time] = std::to_string(block_vector[block_index].time.count());
-                line_buffer[cell_index.b_system_name] = block_vector[block_index].system_name;
+                line_buffer[cell_index.b_cycles]        = std::to_string(block_vector[block_index].cycles);
+                line_buffer[cell_index.b_date]          = std::to_string(block_vector[block_index].date);
+                line_buffer[cell_index.b_n]             = std::to_string(block_vector[block_index].best.n);
+                line_buffer[cell_index.b_m]             = std::to_string(block_vector[block_index].best.m);
+                line_buffer[cell_index.b_e]             = std::to_string(block_vector[block_index].best.e);
+                line_buffer[cell_index.b_r]             = std::to_string(block_vector[block_index].best.r);
+                line_buffer[cell_index.b_matches]       = std::to_string(block_vector[block_index].best.matches);
+                line_buffer[cell_index.b_id]            = std::to_string(block_vector[block_index].id);
+                line_buffer[cell_index.b_state]         = std::to_string(block_vector[block_index].state);
+                line_buffer[cell_index.b_time]          = std::to_string(block_vector[block_index].time.count());
+                line_buffer[cell_index.b_system_name]   = block_vector[block_index].system_name;
 
                 file_out << line_buffer[0];
 
@@ -193,6 +194,7 @@ public:
 
 
     static S_rmw ReadFromFile(std::string path, std::vector<S_block>& target_block) {
+
         S_rmw read_rmw = {};
 
         char line_buffer[LINE_READ_BUFFER_SIZE];
@@ -212,16 +214,16 @@ public:
             std::istringstream csv_buffer(line_buffer);
             std::vector<std::string> cells_buffer = ReadLine(csv_buffer);
 
-            block_buffer[line_index].best.n = stoi(cells_buffer[cell_index.b_n]);
-            block_buffer[line_index].best.m = stoi(cells_buffer[cell_index.b_m]);
-            block_buffer[line_index].best.e = stoi(cells_buffer[cell_index.b_e]);
-            block_buffer[line_index].best.r = stoi(cells_buffer[cell_index.b_r]);
-            block_buffer[line_index].best.matches = stoi(cells_buffer[cell_index.b_matches]);
-            block_buffer[line_index].cycles = stol(cells_buffer[cell_index.b_cycles]);
-            block_buffer[line_index].date = stoi(cells_buffer[cell_index.b_date]);
-            block_buffer[line_index].id = stoi(cells_buffer[cell_index.b_id]);
-            block_buffer[line_index].state = stoi(cells_buffer[cell_index.b_state]);
-            block_buffer[line_index].time = seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
+            block_buffer[line_index].best.n         = stoi(cells_buffer[cell_index.b_n]);
+            block_buffer[line_index].best.m         = stoi(cells_buffer[cell_index.b_m]);
+            block_buffer[line_index].best.e         = stoi(cells_buffer[cell_index.b_e]);
+            block_buffer[line_index].best.r         = stoi(cells_buffer[cell_index.b_r]);
+            block_buffer[line_index].best.matches   = stoi(cells_buffer[cell_index.b_matches]);
+            block_buffer[line_index].cycles         = stol(cells_buffer[cell_index.b_cycles]);
+            block_buffer[line_index].date           = stoi(cells_buffer[cell_index.b_date]);
+            block_buffer[line_index].id             = stoi(cells_buffer[cell_index.b_id]);
+            block_buffer[line_index].state          = stoi(cells_buffer[cell_index.b_state]);
+            block_buffer[line_index].time           = seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
 
             std::string sys_name = cells_buffer[cell_index.b_system_name];
 
@@ -241,6 +243,7 @@ public:
         return read_rmw;
     }
     static void ReadMergeWrite(std::string path) {
+
         global.rmw = ReadFromFile(path, file.block);
 
         if (file.block.size() > global.block.size()) {
@@ -277,6 +280,7 @@ public:
             if (file.block[i].state == 2) { global.rmw.rmw_completed += 1; }
         }
         if (global.rmw.rmw_reads > 0) {
+
             TimeStamp();
             std::cout <<
                 "READ " <<
@@ -289,6 +293,7 @@ public:
         }
 
         if (global.rmw.rmw_writes > 0) {
+
             TimeStamp();
             std::cout << "WRITE writes=" << global.rmw.rmw_writes << " -> " << path << " as [" << global.G_SYSTEM_NAME << "]\n";
             WriteToFile(file.block, path);
@@ -323,18 +328,8 @@ C_rmw rmw;
 
 static std::mutex mlock;
 
-bool square(unsigned long long int x) {
-    if (x > 0) {
-        unsigned long long int sr = sqrt(x);
-        return (sr * sr == x);
-    } return false;
-}
+static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
 
-
-
-
-
-static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
     unsigned long long int A, B, C, D, E, F, G, H, I;
     unsigned long long int t_cycles = 0, t_NM_limit = 0;
 
@@ -348,6 +343,13 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 
     E = t_E * t_E;
     t_NM_limit = E - 1;
+
+    auto square = [](unsigned long long int x) {
+        if (x > 0) {
+            unsigned long long int sr = sqrt(x);
+            return (sr * sr == x);
+        } return false;
+    };
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -412,7 +414,7 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 
     rmw.TimeStamp();
     double cps = (double)t_thread.cycles / t_thread.time.count();
-    //std::cout << std::fixed;
+
     std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
         " cycles=" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
         " t=" << global.block[t_E].thread[t_offset].time.count() <<
@@ -429,6 +431,7 @@ static S_thread thr_SingleE(unsigned long long int t_E, uint_fast32_t t_offset, 
 }
 
 static S_thread thr_Nines(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
+
     unsigned long long int A, B, C, D, E, F, G, H, I;
     unsigned long long int t_cycles = 0, t_NM_limit = 0;
 
@@ -442,6 +445,13 @@ static S_thread thr_Nines(unsigned long long int t_E, uint_fast32_t t_offset, ui
 
     E = t_E * t_E;
     t_NM_limit = E - 1;
+
+    auto square = [](unsigned long long int x) {
+        if (x > 0) {
+            unsigned long long int sr = sqrt(x);
+            return (sr * sr == x);
+        } return false;
+    };
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -521,7 +531,7 @@ end:
 
     rmw.TimeStamp();
     double cps = (double)t_thread.cycles / t_thread.time.count();
-    //std::cout << std::fixed;
+
     std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
         " cycles=" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
         " t=" << global.block[t_E].thread[t_offset].time.count() <<
@@ -539,7 +549,6 @@ end:
 
 int main()
 {
-    
     const auto processor_count = std::thread::hardware_concurrency();
 
 reset:
@@ -557,7 +566,6 @@ reset:
     rmw.TimeStamp();
     std::cout << "INIT  Mode (0=default, 1=nines):";
     std::cin >> global.G_MODE;
-
 
     rmw.TimeStamp();
     std::cout << "INIT  System name:";
@@ -644,7 +652,7 @@ start:
 
             if (global.G_MODE == 0) {
                 for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
-                    thr[g_thread_offset] = std::thread(thr_SingleE, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+                    thr[g_thread_offset] = std::thread(thr_Single, g_block.id, g_thread_offset, global.G_NUM_THREADS);
                 }
                 for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
