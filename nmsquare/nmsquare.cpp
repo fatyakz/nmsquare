@@ -581,6 +581,12 @@ reset:
         global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_FILE_PATH_DEFAULT;
     }
 
+    if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
+        rmw.TimeStamp();
+        std::cout << "ERROR !" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...";
+        goto reset;
+    }
+
     rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
     if (global.rmw.rmw_pending > 0) {
