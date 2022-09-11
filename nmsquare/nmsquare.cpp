@@ -612,7 +612,9 @@ reset:
     }
 
 start:
-    
+    global.time = std::chrono::milliseconds::zero();
+    global.cycles = 0;
+
     rmw.TimeStamp();
     std::cout << "INIT  Start:"; std::cin >> global.G_BLOCK_START;
 
