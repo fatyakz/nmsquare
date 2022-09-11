@@ -704,7 +704,7 @@ start:
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
-            global.time += g_total_time;
+            global.time += global.block[g_block.id].time;
 
         } 
         else {
