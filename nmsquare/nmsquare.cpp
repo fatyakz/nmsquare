@@ -275,33 +275,38 @@ static void ReadMergeWrite(std::string path) {
         if (file.block[i].state == 1) { global.rmw.rmw_pending      += 1; }
         if (file.block[i].state == 2) { global.rmw.rmw_completed    += 1; }
     }
-    TimeStamp();
-    std::cout << 
-        "FILE  " << "<-" <<
-        " read="         << global.rmw.rmw_reads <<
-        " blocks="       << global.rmw.rmw_file_blocks - 1 <<
-        " size="         << global.rmw.rmw_file_size / G_FILESIZE_DIVIDER << G_FILESIZE_SYMBOL <<
-        " complete="     << global.rmw.rmw_completed <<
-        " pending="      << global.rmw.rmw_pending <<
-        " incomplete="   << global.rmw.rmw_incomplete - 1 << "\n";
+    if (global.rmw.rmw_reads > 0) {
+        TimeStamp();
+        std::cout <<
+            "READ  " <<
+            " reads=" << global.rmw.rmw_reads <<
+            " blocks=" << global.rmw.rmw_file_blocks - 1 <<
+            " size=" << global.rmw.rmw_file_size / G_FILESIZE_DIVIDER << G_FILESIZE_SYMBOL <<
+            " complete=" << global.rmw.rmw_completed <<
+            " pending=" << global.rmw.rmw_pending <<
+            " incomplete=" << global.rmw.rmw_incomplete - 1 << "\n";
+    }
 
-    TimeStamp();
-    std::cout << "FILE  write=" << global.rmw.rmw_writes << " -> " << path << " as [" << global.G_SYSTEM_NAME << "]\n";
-    B_WriteToFile(file.block, path);
+    if (global.rmw.rmw_writes > 0) {
+        TimeStamp();
+        std::cout << "WRITE writes=" << global.rmw.rmw_writes << " -> " << path << " as [" << global.G_SYSTEM_NAME << "]\n";
+        B_WriteToFile(file.block, path);
+    }
 
-
-    double cps = ((double)global.cycles * G_CYCLES_DIVIDER) / global.time.count();
-    TimeStamp();
-    std::cout << 
-        "STAT " << 
-        " time="  << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
-        " cycles="  << global.cycles << G_CYCLES_SYMBOL <<
-        " cps=" << cps << B_CYCLES_SYMBOL <<
-        " best="    << global.best.matches <<
-        " n="       << global.best.n <<
-        " m="       << global.best.m <<
-        " e="       << global.best.e <<
-        " r="       << global.best.r << "\n";
+    if (global.rmw.rmw_writes > 0 || global.rmw.rmw_reads > 0) {
+        double cps = ((double)global.cycles * G_CYCLES_DIVIDER) / global.time.count();
+        TimeStamp();
+        std::cout <<
+            "STAT " <<
+            " time=" << global.time.count() / G_TIME_DIVIDER << G_TIME_SYMBOL <<
+            " cycles=" << global.cycles << G_CYCLES_SYMBOL <<
+            " cps=" << cps << B_CYCLES_SYMBOL <<
+            " best=" << global.best.matches <<
+            " n=" << global.best.n <<
+            " m=" << global.best.m <<
+            " e=" << global.best.e <<
+            " r=" << global.best.r << "\n";
+    }
 }
 
 
