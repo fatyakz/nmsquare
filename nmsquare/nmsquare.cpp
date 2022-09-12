@@ -70,6 +70,7 @@ struct S_var {
     std::string G_TIME_SYMBOL               = "m";
     uint_fast32_t G_FILESIZE_DIVIDER        = 1024;
     std::string G_FILESIZE_SYMBOL           = "kb";
+    std::string T_TIME_SYMBOL               = "s";
 };
 struct S_global {
 public:
@@ -429,9 +430,9 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
     }
 
     std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
-        " cycles:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-        " t:" << global.block[t_E].thread[t_offset].time.count() <<
-        " best:" << global.block[t_E].thread[t_offset].best.matches <<
+        " c:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+        " t:" << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+        " b:" << global.block[t_E].thread[t_offset].best.matches <<
         " n:" << global.block[t_E].thread[t_offset].best.n <<
         " m:" << global.block[t_E].thread[t_offset].best.m <<
         " e:" << global.block[t_E].thread[t_offset].best.e <<
@@ -551,9 +552,9 @@ end:
     }
 
     std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset  << "]" <<
-        " cycles:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-        " t:" << global.block[t_E].thread[t_offset].time.count() <<
-        " best:" << global.block[t_E].thread[t_offset].best.matches <<
+        " c:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+        " t:" << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+        " b:" << global.block[t_E].thread[t_offset].best.matches <<
         " n:" << global.block[t_E].thread[t_offset].best.n <<
         " m:" << global.block[t_E].thread[t_offset].best.m <<
         " e:" << global.block[t_E].thread[t_offset].best.e <<
