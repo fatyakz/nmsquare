@@ -26,6 +26,7 @@ public:
     uint_fast32_t                           e;
     uint_fast32_t                           r;
 };
+
 struct S_thread {
 public:
     uint_fast32_t                           id;
@@ -36,6 +37,7 @@ public:
     int                                     offset;
     S_best                                  best = {};
 };
+
 struct S_block {
 public:
     unsigned long long int                  id;
@@ -47,6 +49,7 @@ public:
     uint_fast32_t                           state; 
     std::string                             system_name;
 };
+
 struct S_rmw {
     uint_fast32_t                           rmw_reads;
     uint_fast32_t                           rmw_writes;
@@ -58,20 +61,26 @@ struct S_rmw {
     std::string                             rmw_writemode;
     
 };
+
 struct S_var {
     std::string G_BLOCK_FILE_PATH_DEFAULT   = "block.dat";
     uint_fast32_t T_CYCLES_DIVIDER          = 1;
     std::string T_CYCLES_SYMBOL             = "";
     uint_fast32_t B_CYCLES_DIVIDER          = 1000000;
     std::string B_CYCLES_SYMBOL             = "M";
-    uint_fast32_t G_CYCLES_DIVIDER          = 1000;
+    uint_fast32_t G_CYCLES_DIVIDER          = 1000000;
     std::string G_CYCLES_SYMBOL             = "B";
     uint_fast32_t G_TIME_DIVIDER            = 60;
     std::string G_TIME_SYMBOL               = "m";
     uint_fast32_t G_FILESIZE_DIVIDER        = 1024;
     std::string G_FILESIZE_SYMBOL           = "kb";
     std::string T_TIME_SYMBOL               = "s";
+    uint_fast32_t G_PRECISION               = 2;
+    uint_fast32_t G_MIN_WIDTH               = 5;
+    uint_fast32_t G_MIN_WIDTH_NM            = 4;
+    std::string G_COL_SPACE                 = "  ";
 };
+
 struct S_global {
 public:
     std::vector<S_block>                    block;
@@ -88,6 +97,7 @@ public:
     std::string                             G_SYSTEM_NAME;
     uint_fast32_t                           G_MODE;
 };
+
 struct S_cell_index {
     uint_fast32_t                           _cell_count = 11;
     uint_fast32_t                           b_state = 0;
@@ -103,11 +113,9 @@ struct S_cell_index {
     uint_fast32_t                           b_system_name = 10;
 };
 
-
     S_cell_index        cell_index;
     S_global            global;
     S_global            file;
-    
 
 class C_rmw {
 public:
@@ -117,20 +125,20 @@ public:
     uint_fast32_t                           rmw_file_blocks;
     uint_fast32_t                           rmw_incomplete;
     uint_fast32_t                           rmw_pending;
-    uint_fast32_t                           rmw_completed;
-
-    
+    uint_fast32_t                           rmw_completed;    
 
     static inline bool FileExists(const std::string& name) {
         struct stat buffer;
         return (stat(name.c_str(), &buffer) == 0);
     }
+
     static void TimeStamp() {
         char timestamp[50]{ 0 };
         std::time_t time = std::time(nullptr);
-        std::strftime(timestamp, 30, "[%H:%M:%S] ", std::localtime(&time));
-        std::cout << timestamp;
+        std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
+        std::cout << timestamp << global.var.G_COL_SPACE;
     }
+
     static std::vector<std::string> ReadLine(std::istream& str) {
         std::vector<std::string> result;
         std::string line;
@@ -147,10 +155,12 @@ public:
         }
         return result;
     }
+
     template <typename T>
     static auto seconds_to_duration(T seconds) {
         return std::chrono::duration<T, std::ratio<1>>(seconds);
     }
+
     static long long GetFileSize(std::string path) {
         std::streampos fsize = 0;
         std::ifstream myfile(path, std::ios::in);
@@ -161,6 +171,11 @@ public:
         static_assert(sizeof(fsize) >= sizeof(long long), "Oops.");
         return fsize;
     }
+
+    uint_fast32_t DigitCount(uint_fast32_t number) {
+        return uint_fast32_t(log10(number) + 1);
+    }
+
     static void WriteToFile(std::vector<S_block> block_vector, std::string path) {
         std::ofstream file_out{ path, std::ios::trunc };
 
@@ -198,7 +213,6 @@ public:
         return;
     }
 
-
     static S_rmw ReadFromFile(std::string path, std::vector<S_block>& target_block) {
 
         S_rmw read_rmw = {};
@@ -216,7 +230,6 @@ public:
         while (!in.eof()) { getline(in, s); file_lines++; }
 
         block_buffer.resize(file_lines);
-
 
         while (file_out.getline(line_buffer, LINE_READ_BUFFER_SIZE)) {
             std::istringstream csv_buffer(line_buffer);
@@ -290,8 +303,8 @@ public:
 
             TimeStamp();
             std::cout <<
-                "READ " <<
-                " reads:" << global.rmw.rmw_reads <<
+                "READ " << global.var.G_COL_SPACE <<
+                "[<-" << global.rmw.rmw_reads << "]" <<
                 " blocks:" << global.rmw.rmw_file_blocks - 1 <<
                 " size:" << global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER << global.var.G_FILESIZE_SYMBOL <<
                 " complete:" << global.rmw.rmw_completed <<
@@ -302,7 +315,7 @@ public:
         if (global.rmw.rmw_writes > 0) {
 
             TimeStamp();
-            std::cout << "WRITE blocks:" << global.rmw.rmw_writes << " " << global.rmw.rmw_writemode << " -> " << path << "\n";
+            std::cout << "WRITE" << global.var.G_COL_SPACE << "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
         }  
@@ -312,7 +325,7 @@ public:
 
             double cps = 0;
             if (((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count() > 0) {
-                cps = ((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count();
+                cps = ((double)global.cycles) / global.time.count();
             }
             else {
                 cps = 0;
@@ -320,11 +333,11 @@ public:
 
             TimeStamp();
             std::cout <<
-                "STATS" <<
-                " time:" << global.time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " cycles:" << global.cycles << global.var.G_CYCLES_SYMBOL <<
+                "STATS" << global.var.G_COL_SPACE <<
+                "t:" << global.time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
+                " c:" << global.cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " cps:" << cps << global.var.B_CYCLES_SYMBOL <<
-                " best:" << global.best.matches <<
+                " b:" << global.best.matches <<
                 " n:" << global.best.n <<
                 " m:" << global.best.m <<
                 " e:" << global.best.e <<
@@ -416,29 +429,40 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
     t_thread.time = t_time;
 
     mlock.lock();
-    global.block[t_E].cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
-    global.block[t_E].thread[t_offset] = t_thread;
-    global.block[t_E].id = t_E;
-    global.block[t_E].state = 2;
 
-    rmw.TimeStamp();
-    double cps = (double)t_thread.cycles / t_thread.time.count();
+        global.block[t_E].cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
+        global.block[t_E].thread[t_offset] = t_thread;
+        global.block[t_E].id = t_E;
+        global.block[t_E].state = 2;
 
-    std::string t_offset_spacer = "";
-    if (t_offset < 10) {
-        t_offset_spacer = " ";
-    }
+        global.cycles += global.block[t_E].cycles / global.var.G_CYCLES_DIVIDER;
 
-    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
-        " c:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-        " t:" << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
-        " b:" << global.block[t_E].thread[t_offset].best.matches <<
-        " n:" << global.block[t_E].thread[t_offset].best.n <<
-        " m:" << global.block[t_E].thread[t_offset].best.m <<
-        " e:" << global.block[t_E].thread[t_offset].best.e <<
-        " r:" << global.block[t_E].thread[t_offset].best.r <<
-        " cps:" << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
-        "\n";
+        double cps = (double)t_thread.cycles / t_thread.time.count();
+
+        std::string t_offset_spacer = "";
+        if (t_offset < 10) {
+            t_offset_spacer = " ";
+        }
+
+        if (rmw.DigitCount(global.block[t_E].thread[t_offset].best.n) > global.var.G_MIN_WIDTH_NM) {
+            global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.n);
+        }
+
+        if (rmw.DigitCount(global.block[t_E].thread[t_offset].best.m) > global.var.G_MIN_WIDTH_NM) {
+            global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.m);
+        }
+
+        rmw.TimeStamp();
+        std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+            " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+            " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+            " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+            " b:" << global.block[t_E].thread[t_offset].best.matches <<
+            " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
+            " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
+            " e:" << global.block[t_E].thread[t_offset].best.e <<
+            "\n";
+
     mlock.unlock();
 
     return t_thread;
@@ -538,29 +562,40 @@ end:
     t_thread.time = t_time;
 
     mlock.lock();
-    global.block[t_E].cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
-    global.block[t_E].thread[t_offset] = t_thread;
-    global.block[t_E].id = t_E;
-    global.block[t_E].state = 2;
 
-    rmw.TimeStamp();
-    double cps = (double)t_thread.cycles / t_thread.time.count();
+        global.block[t_E].cycles += t_thread.cycles;// / global.var.B_CYCLES_DIVIDER;
+        global.block[t_E].thread[t_offset] = t_thread;
+        global.block[t_E].id = t_E;
+        global.block[t_E].state = 2;
 
-    std::string t_offset_spacer = "";
-    if (t_offset < 10) {
-        t_offset_spacer = " ";
-    }
+        global.cycles += t_thread.cycles / global.var.G_CYCLES_DIVIDER;
 
-    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset  << "]" <<
-        " c:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-        " t:" << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
-        " b:" << global.block[t_E].thread[t_offset].best.matches <<
-        " n:" << global.block[t_E].thread[t_offset].best.n <<
-        " m:" << global.block[t_E].thread[t_offset].best.m <<
-        " e:" << global.block[t_E].thread[t_offset].best.e <<
-        " r:" << global.block[t_E].thread[t_offset].best.r <<
-        " cps:" << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
-        "\n";
+        double cps = (double)t_thread.cycles / t_thread.time.count();
+
+        std::string t_offset_spacer = "";
+        if (t_offset < 10) {
+            t_offset_spacer = " ";
+        }
+
+        if (rmw.DigitCount(global.block[t_E].thread[t_offset].best.n) > global.var.G_MIN_WIDTH_NM) {
+            global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.n);
+        }
+
+        if (rmw.DigitCount(global.block[t_E].thread[t_offset].best.m) > global.var.G_MIN_WIDTH_NM) {
+            global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.m);
+        }
+
+        rmw.TimeStamp();
+        std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+            " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+            " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+            " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+            " b:" << global.block[t_E].thread[t_offset].best.matches <<
+            " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
+            " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
+            " e:" << global.block[t_E].thread[t_offset].best.e <<
+            "\n";
+
     mlock.unlock();
 
     return t_thread;
@@ -569,6 +604,10 @@ end:
 int main()
 {
     const auto processor_count = std::thread::hardware_concurrency();
+
+    std::cout << std::setprecision(global.var.G_PRECISION);
+    std::cout << std::setw(global.var.G_MIN_WIDTH);
+    std::cout.setf(std::ios::fixed, std::ios::floatfield);
     
 reset:
     global.time = std::chrono::milliseconds::zero();
@@ -576,33 +615,33 @@ reset:
 
     std::cout << "[nmSquare]\n";
     rmw.TimeStamp();
-    std::cout << "INIT  Threads (" << processor_count << " cores):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
     std::cin >> global.G_NUM_THREADS;
     if (global.G_NUM_THREADS == 0) {
         return 0;
     }
 
     rmw.TimeStamp();
-    std::cout << "INIT  Mode (0:default, 1:nines):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines):";
     std::cin >> global.G_MODE;
 
     rmw.TimeStamp();
-    std::cout << "INIT  System name:";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "System name:";
     std::cin >> global.G_SYSTEM_NAME;
 
     rmw.TimeStamp();
-    std::cout << "INIT  (" << global.var.G_BLOCK_FILE_PATH_DEFAULT << "):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_FILE_PATH_DEFAULT << "):";
     std::cin >> global.G_BLOCK_FILE_PATH;
     
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "INIT  " << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << global.var.G_BLOCK_FILE_PATH_DEFAULT <<"\n";
+        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << global.var.G_BLOCK_FILE_PATH_DEFAULT <<"\n";
         global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_FILE_PATH_DEFAULT;
     }
 
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "ERROR !" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...";
+        std::cout << "ERROR" << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...";
         goto reset;
     }
 
@@ -615,7 +654,7 @@ pending:
         std::string clear_pending = "n";
 
         rmw.TimeStamp();
-        std::cout << "INIT  Clear pending? (y/n): "; std::cin >> clear_pending;
+        std::cout << "INIT " << global.var.G_COL_SPACE << "Clear pending? (y/n): "; std::cin >> clear_pending;
 
         if (clear_pending == "y") {
             for (uint_fast32_t i = 0; i < file.block.size(); i++) {
@@ -627,7 +666,7 @@ pending:
             rmw.WriteToFile(file.block, global.G_BLOCK_FILE_PATH);
 
             rmw.TimeStamp();
-            std::cout << "INIT  All pending blocks reset to incomplete\n";
+            std::cout << "INIT " << global.var.G_COL_SPACE << "All pending blocks reset to incomplete\n";
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
             rmw.Stat();
@@ -635,20 +674,20 @@ pending:
         }
     }
 
+    rmw.Stat();
+
 start:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    rmw.Stat();
-
     rmw.TimeStamp();
-    std::cout << "INIT  Start:"; std::cin >> global.G_BLOCK_START;
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Start:"; std::cin >> global.G_BLOCK_START;
 
     if (global.G_BLOCK_START == 0) {
         goto reset;
     }
     rmw.TimeStamp();
-    std::cout << "INIT  Blocks:"; std::cin >> global.G_LIMIT;
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
     std::chrono::high_resolution_clock::time_point g1 = std::chrono::high_resolution_clock::now();
 
     auto g_date = std::chrono::system_clock::now();
@@ -657,7 +696,7 @@ start:
     if (global.block.size() < (global.G_BLOCK_START + global.G_LIMIT)) { global.block.resize(global.G_BLOCK_START + global.G_LIMIT); }
 
     rmw.TimeStamp();
-    std::wcout << "START [" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
+    std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
     for (uint_fast32_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
@@ -677,7 +716,7 @@ start:
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
             rmw.TimeStamp();
-            std::cout << "BLOCK [" << g_block.id << " of " << global.G_BLOCK_START + global.G_LIMIT - 1 <<
+            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << " of " << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] threads:" << global.G_NUM_THREADS << " state:PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
@@ -709,7 +748,7 @@ start:
             std::chrono::high_resolution_clock::time_point b2 = std::chrono::high_resolution_clock::now();
             global.block[g_block.id].time = std::chrono::duration_cast<std::chrono::duration<double>>(b2 - b1);
 
-            global.cycles += global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER;
+            //global.cycles += global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER;
 
             if (global.block[g_block.id].best.matches >= global.best.matches) {
                 global.best = global.block[g_block.id].best;
@@ -717,10 +756,15 @@ start:
 
             rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
-            std::cout << "BLOCK [" << g_block.id << "] state:COMPLETE" << 
-                " cycles:"  << global.block[g_block.id].cycles << global.var.B_CYCLES_SYMBOL <<
+            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] state:COMPLETE" <<
+                " cycles:"  << global.block[g_block.id].cycles / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
                 " time:"    << global.block[g_block.id].time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " cps:"    << cps << global.var.B_CYCLES_SYMBOL << "\n";
+                " cps:"    << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "\n";
+
+            global.time += global.block[g_block.id].time;
+
+            rmw.Stat();
+
 
             global.block[g_block.id].state = 2;
             global.rmw.rmw_writemode = 
@@ -729,17 +773,17 @@ start:
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
-            global.time += global.block[g_block.id].time;
+            
 
         } 
         else {
             if (global.block[id].state == 1) {
                 rmw.TimeStamp();
-                std::cout << "SKIP  Block [" << id << "] state:PENDING  (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" << global.block[id].system_name << "), skipping...\n";
             }
             if (global.block[id].state == 2) {
                 rmw.TimeStamp();
-                std::cout << "SKIP  Block [" << id << "] state:COMPLETE (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" << global.block[id].system_name << "), skipping...\n";
             }
         }
     }
