@@ -335,7 +335,7 @@ public:
             std::cout <<
                 "STATS" << global.var.G_COL_SPACE <<
                 "t:" << global.time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " c:" << global.cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
+                " c:" << global.cycles << global.var.G_CYCLES_SYMBOL <<
                 " cps:" << cps << global.var.B_CYCLES_SYMBOL <<
                 " b:" << global.best.matches <<
                 " n:" << global.best.n <<
@@ -430,12 +430,12 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
 
     mlock.lock();
 
-        global.block[t_E].cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
+        global.block[t_E].cycles += t_thread.cycles;// / global.var.B_CYCLES_DIVIDER;
         global.block[t_E].thread[t_offset] = t_thread;
         global.block[t_E].id = t_E;
         global.block[t_E].state = 2;
 
-        global.cycles += global.block[t_E].cycles / global.var.G_CYCLES_DIVIDER;
+        global.cycles += t_thread.cycles / global.var.G_CYCLES_DIVIDER;
 
         double cps = (double)t_thread.cycles / t_thread.time.count();
 
@@ -765,15 +765,12 @@ start:
 
             rmw.Stat();
 
-
             global.block[g_block.id].state = 2;
             global.rmw.rmw_writemode = 
                 "[s:" + std::to_string(global.block[g_block.id].state) + " id:" + std::to_string(g_block.id) + " (" + global.G_SYSTEM_NAME + ")]";
 
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
-
-            
 
         } 
         else {
