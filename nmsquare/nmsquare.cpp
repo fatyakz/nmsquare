@@ -20,7 +20,7 @@
 
 struct S_best {
 public:
-    uint_fast32_t                       matches;
+    uint_fast32_t                           matches;
     uint_fast32_t                           n;
     uint_fast32_t                           m;
     uint_fast32_t                           e;
@@ -423,7 +423,12 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
     rmw.TimeStamp();
     double cps = (double)t_thread.cycles / t_thread.time.count();
 
-    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
+    std::string t_offset_spacer = "";
+    if (t_offset < 10) {
+        t_offset_spacer = " ";
+    }
+
+    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
         " cycles:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
         " t:" << global.block[t_E].thread[t_offset].time.count() <<
         " best:" << global.block[t_E].thread[t_offset].best.matches <<
@@ -540,7 +545,12 @@ end:
     rmw.TimeStamp();
     double cps = (double)t_thread.cycles / t_thread.time.count();
 
-    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << "+" << t_offset << "]" <<
+    std::string t_offset_spacer = "";
+    if (t_offset < 10) {
+        t_offset_spacer = " ";
+    }
+
+    std::cout << "PROC  [" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset  << "]" <<
         " cycles:" << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
         " t:" << global.block[t_E].thread[t_offset].time.count() <<
         " best:" << global.block[t_E].thread[t_offset].best.matches <<
@@ -558,7 +568,7 @@ end:
 int main()
 {
     const auto processor_count = std::thread::hardware_concurrency();
-
+    
 reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
@@ -724,11 +734,11 @@ start:
         else {
             if (global.block[id].state == 1) {
                 rmw.TimeStamp();
-                std::cout << "SKIP  Block [" << id << "] flagged pending (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP  Block [" << id << "] state:PENDING  (" << global.block[id].system_name << "), skipping...\n";
             }
             if (global.block[id].state == 2) {
                 rmw.TimeStamp();
-                std::cout << "SKIP  Block [" << id << "] flagged completed (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP  Block [" << id << "] state:COMPLETE (" << global.block[id].system_name << "), skipping...\n";
             }
         }
     }
