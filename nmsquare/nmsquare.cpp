@@ -325,7 +325,7 @@ public:
 
             double cps = 0;
             if (((double)global.cycles * global.var.G_CYCLES_DIVIDER) / global.time.count() > 0) {
-                cps = ((double)global.cycles) / global.time.count();
+                cps = ((double)global.cycles * 1000) / global.time.count();
             }
             else {
                 cps = 0;
@@ -755,7 +755,7 @@ start:
 
             rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
-            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] state:COMPLETE" <<
+            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
                 " cycles:"  << global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " time:"    << global.block[g_block.id].time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
                 " cps:"     << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "\n";
