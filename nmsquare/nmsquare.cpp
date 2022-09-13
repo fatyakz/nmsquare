@@ -68,7 +68,7 @@ struct S_var {
     std::string T_CYCLES_SYMBOL             = "";
     uint_fast32_t B_CYCLES_DIVIDER          = 1000000;
     std::string B_CYCLES_SYMBOL             = "M";
-    uint_fast32_t G_CYCLES_DIVIDER          = 1000000;
+    uint_fast32_t G_CYCLES_DIVIDER          = 1000000000;
     std::string G_CYCLES_SYMBOL             = "B";
     uint_fast32_t G_TIME_DIVIDER            = 60;
     std::string G_TIME_SYMBOL               = "m";
@@ -430,7 +430,7 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
 
     mlock.lock();
 
-        global.block[t_E].cycles += t_thread.cycles;// / global.var.B_CYCLES_DIVIDER;
+        global.block[t_E].cycles += t_thread.cycles;
         global.block[t_E].thread[t_offset] = t_thread;
         global.block[t_E].id = t_E;
         global.block[t_E].state = 2;
@@ -453,7 +453,8 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
         }
 
         rmw.TimeStamp();
-        std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+        std::cout << "PROC " << global.var.G_COL_SPACE << 
+            "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
             " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
             " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
             " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
@@ -563,7 +564,7 @@ end:
 
     mlock.lock();
 
-        global.block[t_E].cycles += t_thread.cycles;// / global.var.B_CYCLES_DIVIDER;
+        global.block[t_E].cycles += t_thread.cycles;
         global.block[t_E].thread[t_offset] = t_thread;
         global.block[t_E].id = t_E;
         global.block[t_E].state = 2;
@@ -748,8 +749,6 @@ start:
             std::chrono::high_resolution_clock::time_point b2 = std::chrono::high_resolution_clock::now();
             global.block[g_block.id].time = std::chrono::duration_cast<std::chrono::duration<double>>(b2 - b1);
 
-            //global.cycles += global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER;
-
             if (global.block[g_block.id].best.matches >= global.best.matches) {
                 global.best = global.block[g_block.id].best;
             }
@@ -757,9 +756,9 @@ start:
             rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] state:COMPLETE" <<
-                " cycles:"  << global.block[g_block.id].cycles / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+                " cycles:"  << global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " time:"    << global.block[g_block.id].time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " cps:"    << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "\n";
+                " cps:"     << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "\n";
 
             global.time += global.block[g_block.id].time;
 
