@@ -767,10 +767,10 @@ start:
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] thr:" << global.G_NUM_THREADS << 
-                " avg_cps[" << global.var.G_AVG_CPS_RANGE << "]:" << predicted_cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
-                " pr_cyc:" << predicted_cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
-                " pr_eta:" << predicted_seconds / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " PENDING...\n";
+                " avg[cps:" << predicted_cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
+                " est[c:" << predicted_cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
+                " t:" << predicted_seconds / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
+                "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
 
