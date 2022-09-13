@@ -138,6 +138,7 @@ public:
 
         double percent = 0;
 
+
         TimeStamp();
 
         std::cout << "LIMIT" << global.var.G_COL_SPACE;
