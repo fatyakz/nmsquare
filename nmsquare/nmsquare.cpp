@@ -79,6 +79,7 @@ struct S_var {
     uint_fast32_t G_MIN_WIDTH               = 5;
     uint_fast32_t G_MIN_WIDTH_NM            = 4;
     std::string G_COL_SPACE                 = "  ";
+    uint_fast32_t G_AVG_CPS_RANGE           = 30;
 };
 
 struct S_global {
@@ -125,27 +126,59 @@ public:
     uint_fast32_t                           rmw_file_blocks;
     uint_fast32_t                           rmw_incomplete;
     uint_fast32_t                           rmw_pending;
-    uint_fast32_t                           rmw_completed;    
+    uint_fast32_t                           rmw_completed;
+
+    static double GetAverageCPS(std::string system, uint_fast32_t range) {
+        
+        uint_fast32_t                   scanned = 0;
+        unsigned long long int          t_cycles = 0;
+        std::chrono::duration<double>   t_time = std::chrono::milliseconds::zero();
+        double                          t_cps = 0;
+
+        for (uint_fast32_t id = global.rmw.rmw_completed; id > 0; id--) {
+
+            if (global.block[id].system_name == system) {
+                t_cycles += global.block[id].cycles;
+                t_time += global.block[id].time;
+                scanned++;
+            }
+
+            if (scanned >= range) { 
+                break; 
+            }
+        }
+
+        if (t_cycles > 0 && t_time.count() > 0) {
+            t_cps = (double)t_cycles / t_time.count();
+        }
+
+        return t_cps;
+    }
 
     static inline bool FileExists(const std::string& name) {
+
         struct stat buffer;
         return (stat(name.c_str(), &buffer) == 0);
     }
 
     static void TimeStamp() {
-        char timestamp[50]{ 0 };
-        std::time_t time = std::time(nullptr);
+
+        char            timestamp[50]{ 0 };
+        std::time_t     time = std::time(nullptr);
+
         std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
         std::cout << timestamp << global.var.G_COL_SPACE;
     }
 
     static std::vector<std::string> ReadLine(std::istream& str) {
-        std::vector<std::string> result;
-        std::string line;
+
+        std::vector<std::string>    result;
+        std::string                 line;
+
         std::getline(str, line);
 
-        std::stringstream lineStream(line);
-        std::string cell;
+        std::stringstream           lineStream(line);
+        std::string                 cell;
 
         while (std::getline(lineStream, cell, ',')) {
             result.push_back(cell);
@@ -157,26 +190,34 @@ public:
     }
 
     template <typename T>
+
     static auto seconds_to_duration(T seconds) {
+
         return std::chrono::duration<T, std::ratio<1>>(seconds);
     }
 
     static long long GetFileSize(std::string path) {
-        std::streampos fsize = 0;
-        std::ifstream myfile(path, std::ios::in);
+
+        std::streampos  fsize = 0;
+        std::ifstream   myfile(path, std::ios::in);
+
         fsize = myfile.tellg();
         myfile.seekg(0, std::ios::end);
         fsize = myfile.tellg() - fsize;
         myfile.close();
-        static_assert(sizeof(fsize) >= sizeof(long long), "Oops.");
+
+        static_assert(sizeof(fsize) >= sizeof(long long), "Unable to read file size in [GetFileSize()]");
+
         return fsize;
     }
 
     uint_fast32_t DigitCount(uint_fast32_t number) {
+
         return uint_fast32_t(log10(number) + 1);
     }
 
     static void WriteToFile(std::vector<S_block> block_vector, std::string path) {
+
         std::ofstream file_out{ path, std::ios::trunc };
 
         if (block_vector.size() > 0) {
@@ -717,8 +758,19 @@ start:
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
             rmw.TimeStamp();
-            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << " of " << global.G_BLOCK_START + global.G_LIMIT - 1 <<
-                "] threads:" << global.G_NUM_THREADS << " state:PENDING...\n";
+
+            // predicted time for block GetAveCPS, predicted finish HHMMSS = now + p_time
+
+            unsigned long long int  predicted_cycles    = (g_block.id * g_block.id * g_block.id * g_block.id) / 2;
+            double                  predicted_cps       = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
+            double                  predicted_seconds   = predicted_cycles / predicted_cps;
+
+            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
+                "] thr:" << global.G_NUM_THREADS << 
+                " avg_cps[" << global.var.G_AVG_CPS_RANGE << "]:" << predicted_cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+                " pr_cyc:" << predicted_cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
+                " pr_eta:" << predicted_seconds / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
+                " PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
 
