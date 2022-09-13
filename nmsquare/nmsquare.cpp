@@ -20,19 +20,19 @@
 
 struct S_best {
 public:
-    uint_fast32_t                           matches;
-    uint_fast32_t                           n;
-    uint_fast32_t                           m;
-    uint_fast32_t                           e;
-    uint_fast32_t                           r;
+    uint_fast64_t                           matches;
+    uint_fast64_t                           n;
+    uint_fast64_t                           m;
+    uint_fast64_t                           e;
+    uint_fast64_t                           r;
 };
 
 struct S_thread {
 public:
-    uint_fast32_t                           id;
+    uint_fast64_t                           id;
     std::chrono::duration<double>           time;
     std::time_t                             date;
-    unsigned long long int                  cycles;
+    uint_fast64_t                           cycles;
     int                                     step;
     int                                     offset;
     S_best                                  best = {};
@@ -40,46 +40,51 @@ public:
 
 struct S_block {
 public:
-    unsigned long long int                  id;
+    uint_fast64_t                           id;
     std::chrono::duration<double>           time;
     std::time_t                             date;
-    unsigned long long int                  cycles;
+    uint_fast64_t                           cycles;
     S_best                                  best = {};
     std::vector<S_thread>                   thread;
-    uint_fast32_t                           state; 
+    uint_fast64_t                           state; 
     std::string                             system_name;
 };
 
 struct S_rmw {
-    uint_fast32_t                           rmw_reads;
-    uint_fast32_t                           rmw_writes;
-    uint_fast32_t                           rmw_file_size;
-    uint_fast32_t                           rmw_file_blocks;
-    uint_fast32_t                           rmw_incomplete;
-    uint_fast32_t                           rmw_pending;
-    uint_fast32_t                           rmw_completed;
+    uint_fast64_t                           rmw_reads;
+    uint_fast64_t                           rmw_writes;
+    uint_fast64_t                           rmw_file_size;
+    uint_fast64_t                           rmw_file_blocks;
+    uint_fast64_t                           rmw_incomplete;
+    uint_fast64_t                           rmw_pending;
+    uint_fast64_t                           rmw_completed;
     std::string                             rmw_writemode;
     
 };
 
 struct S_var {
-    std::string G_BLOCK_FILE_PATH_DEFAULT   = "block.dat";
-    uint_fast32_t T_CYCLES_DIVIDER          = 1;
-    std::string T_CYCLES_SYMBOL             = "";
-    uint_fast32_t B_CYCLES_DIVIDER          = 1000000;
-    std::string B_CYCLES_SYMBOL             = "M";
-    uint_fast32_t G_CYCLES_DIVIDER          = 1000000000;
-    std::string G_CYCLES_SYMBOL             = "B";
-    uint_fast32_t G_TIME_DIVIDER            = 60;
-    std::string G_TIME_SYMBOL               = "m";
-    uint_fast32_t G_FILESIZE_DIVIDER        = 1024;
-    std::string G_FILESIZE_SYMBOL           = "kb";
-    std::string T_TIME_SYMBOL               = "s";
-    uint_fast32_t G_PRECISION               = 2;
-    uint_fast32_t G_MIN_WIDTH               = 5;
-    uint_fast32_t G_MIN_WIDTH_NM            = 4;
-    std::string G_COL_SPACE                 = "  ";
-    uint_fast32_t G_AVG_CPS_RANGE           = 30;
+    std::string     G_BLOCK_FILE_PATH_DEFAULT = "block.dat";
+    uint_fast64_t   T_CYCLES_DIVIDER          = 1;
+    std::string     T_CYCLES_SYMBOL           = "";
+    uint_fast64_t   B_CYCLES_DIVIDER          = 1000000;
+    std::string     B_CYCLES_SYMBOL           = "M";
+    uint_fast64_t   G_CYCLES_DIVIDER          = 1000000000;
+    std::string     G_CYCLES_SYMBOL           = "B";
+    uint_fast64_t   G_TIME_DIVIDER            = 60;
+    std::string     G_TIME_SYMBOL             = "m";
+    uint_fast64_t   G_FILESIZE_DIVIDER        = 1024;
+    std::string     G_FILESIZE_SYMBOL         = "kb";
+    std::string     T_TIME_SYMBOL             = "s";
+    uint_fast64_t   G_PRECISION               = 2;
+    uint_fast64_t   G_MIN_WIDTH               = 5;
+    uint_fast64_t   G_MIN_WIDTH_NM            = 4;
+    std::string     G_COL_SPACE               = "  ";
+    uint_fast64_t   G_AVG_CPS_RANGE           = 30;
+};
+
+struct S_sizelimits {
+    static const uint_fast64_t              ss_uint64 = 18446744073709551615;
+    const double                            sl_double = 9007199254740991;
 };
 
 struct S_global {
@@ -87,31 +92,32 @@ public:
     std::vector<S_block>                    block;
     std::time_t                             date;
     std::chrono::duration<double>           time;
-    unsigned long long int                  cycles;
+    uint_fast64_t                           cycles;
     S_var                                   var = {};
     S_rmw                                   rmw = {};
     S_best                                  best = {};
-    uint_fast32_t                           G_BLOCK_START;
-    uint_fast32_t                           G_LIMIT;
+    S_sizelimits                            limits;
+    uint_fast64_t                           G_BLOCK_START;
+    uint_fast64_t                           G_LIMIT;
     std::string                             G_BLOCK_FILE_PATH = "block.dat";
-    uint_fast32_t                           G_NUM_THREADS;
+    uint_fast64_t                           G_NUM_THREADS;
     std::string                             G_SYSTEM_NAME;
-    uint_fast32_t                           G_MODE;
+    uint_fast64_t                           G_MODE;
 };
 
 struct S_cell_index {
-    uint_fast32_t                           _cell_count = 11;
-    uint_fast32_t                           b_state = 0;
-    uint_fast32_t                           b_id = 1;
-    uint_fast32_t                           b_time = 2;
-    uint_fast32_t                           b_date = 3;
-    uint_fast32_t                           b_cycles = 4;
-    uint_fast32_t                           b_n = 5;
-    uint_fast32_t                           b_m = 6;
-    uint_fast32_t                           b_e = 7;
-    uint_fast32_t                           b_r = 8;
-    uint_fast32_t                           b_matches = 9;
-    uint_fast32_t                           b_system_name = 10;
+    uint_fast64_t                           _cell_count = 11;
+    uint_fast64_t                           b_state = 0;
+    uint_fast64_t                           b_id = 1;
+    uint_fast64_t                           b_time = 2;
+    uint_fast64_t                           b_date = 3;
+    uint_fast64_t                           b_cycles = 4;
+    uint_fast64_t                           b_n = 5;
+    uint_fast64_t                           b_m = 6;
+    uint_fast64_t                           b_e = 7;
+    uint_fast64_t                           b_r = 8;
+    uint_fast64_t                           b_matches = 9;
+    uint_fast64_t                           b_system_name = 10;
 };
 
     S_cell_index        cell_index;
@@ -120,35 +126,61 @@ struct S_cell_index {
 
 class C_rmw {
 public:
-    uint_fast32_t                           rmw_reads;
-    uint_fast32_t                           rmw_writes;
-    uint_fast32_t                           rmw_file_size;
-    uint_fast32_t                           rmw_file_blocks;
-    uint_fast32_t                           rmw_incomplete;
-    uint_fast32_t                           rmw_pending;
-    uint_fast32_t                           rmw_completed;
+    uint_fast64_t                           rmw_reads;
+    uint_fast64_t                           rmw_writes;
+    uint_fast64_t                           rmw_file_size;
+    uint_fast64_t                           rmw_file_blocks;
+    uint_fast64_t                           rmw_incomplete;
+    uint_fast64_t                           rmw_pending;
+    uint_fast64_t                           rmw_completed;
 
-    static double GetAverageCPS(std::string system, uint_fast32_t range) {
+    static void CheckLimits(uint_fast64_t id) {
+
+        double percent = 0;
+
+        TimeStamp();
+
+        std::cout << "LIMIT" << global.var.G_COL_SPACE;
+
+        percent = (global.cycles / global.limits.ss_uint64) * 100;
+        std::cout << "[g.c:" << global.cycles << "=" << percent << " ";
+
+        percent = (global.block[id].cycles / global.limits.ss_uint64) * 100;
+        std::cout << "b.c:" << global.block[id].cycles << "=" << percent << " ";
+
+        percent = (global.block[id].thread[0].cycles / global.limits.ss_uint64) * 100;
+        std::cout << "t.c:" << global.block[id].thread[0].cycles << "=" << percent << " ";
+
+        percent = ((id * id) / global.limits.ss_uint64) * 100;
+        std::cout << "e:" << id * id << "=" << percent << "]\n";
+
         
-        uint_fast32_t                   scanned = 0;
-        unsigned long long int          t_cycles = 0;
-        std::chrono::duration<double>   t_time = std::chrono::milliseconds::zero();
-        double                          t_cps = 0;
+    }
 
-        for (uint_fast32_t id = global.rmw.rmw_completed; id > 0; id--) {
+    static double GetAverageCPS(std::string system, uint_fast64_t range) {
+        
+        uint_fast64_t                   scanned = 0;
+        uint_fast64_t                   t_cycles = 0;
+        double                          t_cps = 0;
+        std::chrono::duration<double>   t_time = std::chrono::milliseconds::zero();
+
+        for (uint_fast64_t id = global.rmw.rmw_completed; id > 0; id--) {
 
             if (global.block[id].system_name == system) {
+
                 t_cycles += global.block[id].cycles;
                 t_time += global.block[id].time;
                 scanned++;
             }
 
             if (scanned >= range) { 
+
                 break; 
             }
         }
 
         if (t_cycles > 0 && t_time.count() > 0) {
+
             t_cps = (double)t_cycles / t_time.count();
         }
 
@@ -183,9 +215,11 @@ public:
         while (std::getline(lineStream, cell, ',')) {
             result.push_back(cell);
         }
+
         if (!lineStream && cell.empty()) {
             result.push_back("");
         }
+
         return result;
     }
 
@@ -211,19 +245,19 @@ public:
         return fsize;
     }
 
-    uint_fast32_t DigitCount(uint_fast32_t number) {
+    uint_fast64_t DigitCount(uint_fast64_t number) {
 
-        return uint_fast32_t(log10(number) + 1);
+        return uint_fast64_t(log10(number) + 1);
     }
 
     static void WriteToFile(std::vector<S_block> block_vector, std::string path) {
 
-        std::ofstream file_out{ path, std::ios::trunc };
+        std::ofstream file_out{path, std::ios::trunc};
 
         if (block_vector.size() > 0) {
             std::vector<std::string> line_buffer;
 
-            for (uint_fast32_t block_index = 0; block_index < block_vector.size(); block_index++) {
+            for (uint_fast64_t block_index = 0; block_index < block_vector.size(); block_index++) {
 
                 line_buffer.resize(cell_index._cell_count);
 
@@ -241,7 +275,7 @@ public:
 
                 file_out << line_buffer[0];
 
-                for (uint_fast32_t cell_pointer = 1; cell_pointer < cell_index._cell_count; cell_pointer++) {
+                for (uint_fast64_t cell_pointer = 1; cell_pointer < cell_index._cell_count; cell_pointer++) {
                     file_out << ",";
                     file_out << line_buffer[cell_pointer];
                 }
@@ -321,7 +355,7 @@ public:
         global.rmw.rmw_pending = 0;
         global.rmw.rmw_completed = 0;
 
-        for (unsigned long long int i = 0; i < file.block.size(); i++) {
+        for (uint_fast64_t i = 0; i < file.block.size(); i++) {
 
             if (file.block[i].state != global.block[i].state) {
                 if (file.block[i].state > global.block[i].state) {
@@ -391,12 +425,12 @@ C_rmw rmw;
 
 static std::mutex mlock;
 
-static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
+static S_thread thr_Single(uint_fast64_t t_E, uint_fast64_t t_offset, uint_fast64_t t_step) {
 
-    unsigned long long int A, B, C, D, E, F, G, H, I;
-    unsigned long long int t_cycles = 0, t_NM_limit = 0;
+    uint_fast64_t A, B, C, D, E, F, G, H, I;
+    uint_fast64_t t_cycles = 0, t_NM_limit = 0;
 
-    uint_fast32_t t_matches = 0;
+    uint_fast64_t t_matches = 0;
 
     S_thread t_thread{};
     t_thread.best.matches = 0;
@@ -407,17 +441,17 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
     E = t_E * t_E;
     t_NM_limit = E - 1;
 
-    auto square = [](unsigned long long int x) {
+    auto square = [](uint_fast64_t x) {
         if (x > 0) {
-            unsigned long long int sr = sqrt(x);
+            uint_fast64_t sr = sqrt(x);
             return (sr * sr == x);
         } return false;
     };
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-    for (unsigned long long int lN = 1; lN < t_NM_limit; lN++) {
-        for (unsigned long long int lM = t_offset + 1; lM < t_NM_limit; lM += t_step) {
+    for (uint_fast64_t lN = 1; lN < t_NM_limit; lN++) {
+        for (uint_fast64_t lM = t_offset + 1; lM < t_NM_limit; lM += t_step) {
             if (lN == lM) {
                 goto end;
             }
@@ -510,12 +544,12 @@ static S_thread thr_Single(unsigned long long int t_E, uint_fast32_t t_offset, u
     return t_thread;
 }
 
-static S_thread thr_Nines(unsigned long long int t_E, uint_fast32_t t_offset, uint_fast32_t t_step) {
+static S_thread thr_Nines(uint_fast64_t t_E, uint_fast64_t t_offset, uint_fast64_t t_step) {
 
-    unsigned long long int A, B, C, D, E, F, G, H, I;
-    unsigned long long int t_cycles = 0, t_NM_limit = 0;
+    uint_fast64_t A, B, C, D, E, F, G, H, I;
+    uint_fast64_t t_cycles = 0, t_NM_limit = 0;
 
-    uint_fast32_t t_matches = 0;
+    uint_fast64_t t_matches = 0;
 
     S_thread t_thread{};
     t_thread.best.matches = 0;
@@ -526,17 +560,17 @@ static S_thread thr_Nines(unsigned long long int t_E, uint_fast32_t t_offset, ui
     E = t_E * t_E;
     t_NM_limit = E - 1;
 
-    auto square = [](unsigned long long int x) {
+    auto square = [](uint_fast64_t x) {
         if (x > 0) {
-            unsigned long long int sr = sqrt(x);
+            uint_fast64_t sr = sqrt(x);
             return (sr * sr == x);
         } return false;
     };
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-    for (unsigned long long int lN = 1; lN < t_NM_limit; lN++) {
-        for (unsigned long long int lM = t_offset + 1; lM < t_NM_limit; lM += t_step) {
+    for (uint_fast64_t lN = 1; lN < t_NM_limit; lN++) {
+        for (uint_fast64_t lM = t_offset + 1; lM < t_NM_limit; lM += t_step) {
             if (lN == lM) {
                 goto end;
             }
@@ -699,7 +733,7 @@ pending:
         std::cout << "INIT " << global.var.G_COL_SPACE << "Clear pending? (y/n): "; std::cin >> clear_pending;
 
         if (clear_pending == "y") {
-            for (uint_fast32_t i = 0; i < file.block.size(); i++) {
+            for (uint_fast64_t i = 0; i < file.block.size(); i++) {
                 if (file.block[i].state == 1) {
                     file.block[i].state = 0;
                     global.block[i].state = 0;
@@ -740,7 +774,7 @@ start:
     rmw.TimeStamp();
     std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
-    for (uint_fast32_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
+    for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         
@@ -759,9 +793,7 @@ start:
 
             rmw.TimeStamp();
 
-            // predicted time for block GetAveCPS, predicted finish HHMMSS = now + p_time
-
-            unsigned long long int  predicted_cycles    = (g_block.id * g_block.id * g_block.id * g_block.id) / 2;
+            uint_fast64_t  predicted_cycles    = (g_block.id * g_block.id * g_block.id * g_block.id) / 2;
             double                  predicted_cps       = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
             double                  predicted_seconds   = predicted_cycles / predicted_cps;
 
@@ -782,18 +814,18 @@ start:
             std::vector<std::thread> thr(global.G_NUM_THREADS);
 
             if (global.G_MODE == 0) {
-                for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
                     thr[g_thread_offset] = std::thread(thr_Single, g_block.id, g_thread_offset, global.G_NUM_THREADS);
                 }
-                for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
                 }
             }
             if (global.G_MODE == 1) {
-                for (uint_fast32_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
                     thr[g_thread_offset] = std::thread(thr_Nines, g_block.id, g_thread_offset, global.G_NUM_THREADS);
                 }
-                for (uint_fast32_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
                 }
             }
@@ -823,6 +855,8 @@ start:
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
+            rmw.CheckLimits(g_block.id);
+            
         } 
         else {
             if (global.block[id].state == 1) {
