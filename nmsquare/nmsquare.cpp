@@ -785,10 +785,10 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     */
 
     std::string t_offset_spacer = "  ";
-    if (offset < 10) {
+    if (offset > 9) {
         t_offset_spacer = " ";
     }
-    if (offset < 100) {
+    if (offset > 99) {
         t_offset_spacer = "";
     }
 
