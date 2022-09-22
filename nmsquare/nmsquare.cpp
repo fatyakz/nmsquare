@@ -316,7 +316,7 @@ public:
             block_buffer[line_index].best.e         = stoi(cells_buffer[cell_index.b_e]);
             block_buffer[line_index].best.r         = stoi(cells_buffer[cell_index.b_r]);
             block_buffer[line_index].best.matches   = stoi(cells_buffer[cell_index.b_matches]);
-            block_buffer[line_index].cycles         = stol(cells_buffer[cell_index.b_cycles]);
+            block_buffer[line_index].cycles         = stoll(cells_buffer[cell_index.b_cycles]);
             block_buffer[line_index].date           = stoi(cells_buffer[cell_index.b_date]);
             block_buffer[line_index].id             = stoi(cells_buffer[cell_index.b_id]);
             block_buffer[line_index].state          = stoi(cells_buffer[cell_index.b_state]);
@@ -678,6 +678,93 @@ end:
     return t_thread;
 }
 
+
+static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
+    S_thread t_thread;
+
+    std::mutex tex;
+    uint_fast32_t a, b, c, d, e, f, g, h, i;
+    uint_fast64_t cycles = 0; uint_fast32_t matches = 0; uint_fast32_t best = 0;
+    e = start * start;
+    uint_fast32_t nmlimit = e;
+    uint_fast32_t bestn = 0, bestm = 0;
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    auto isPerfectSquare = [](uint_fast64_t x) {
+        if (x > 0) {
+            uint_fast64_t sr = sqrt(x);
+            return (sr * sr == x);
+        } return false;
+    };
+
+    for (uint_fast32_t n = 1; n < nmlimit; n++) {
+        for (uint_fast32_t m = 1 + offset; m < nmlimit; m += threadcount) {
+            //if (n == m) { goto end; }
+            if (n + m >= e) { break; }
+
+            a = e + n;
+            if (!isPerfectSquare(a)) { goto end; }
+            matches++;
+            b = e - n - m;
+            if (!isPerfectSquare(b)) { goto end; }
+            matches++;
+            c = e + n;
+            if (!isPerfectSquare(c)) { goto end; }
+            matches++;
+            d = e - n + m;
+            if (!isPerfectSquare(d)) { goto end; }
+            matches++;
+            f = e + n - m;
+            if (!isPerfectSquare(f)) { goto end; }
+            matches++;
+            g = e - n;
+            if (!isPerfectSquare(g)) { goto end; }
+            matches++;
+            h = e + n + m;
+            if (!isPerfectSquare(h)) { goto end; }
+            matches++;
+            i = e - n;
+            if (!isPerfectSquare(i)) { goto end; }
+            matches++;
+
+        end:
+
+            if (matches > best) {
+                best = matches;
+                bestn = n; bestm = m;
+            }
+            matches = 1;
+        }
+    }
+
+
+    tex.lock();
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+    cycles = (e * e * e * e) / 2;
+
+    double cps = (double)cycles / t_time.count();
+
+    std::cout << std::fixed;
+    std::cout << "best:" << best;
+    std::cout << " n:" << bestn;
+    std::cout << " m:" << bestm;
+    std::cout << " cycles:" << cycles / 1000000 << "m";
+    std::cout << " time:" << t_time.count();
+    std::cout << " cps:" << cps / 1000000 << "m\n";
+
+    if (best > t_thread.best.matches) {
+        t_thread.best.matches = best; t_thread.best.m = bestm; t_thread.best.n = bestn;
+    }
+    t_thread.id = start;
+
+    tex.unlock();
+
+    return t_thread;
+}
+
+
 int main()
 {
     const auto processor_count = std::thread::hardware_concurrency();
@@ -699,7 +786,7 @@ reset:
     }
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2):";
     std::cin >> global.G_MODE;
 
     rmw.TimeStamp();
@@ -825,6 +912,14 @@ start:
             if (global.G_MODE == 1) {
                 for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
                     thr[g_thread_offset] = std::thread(thr_Nines, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+                }
+                for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                    thr[g_thread_id].join();
+                }
+            }
+            if (global.G_MODE == 2) {
+                for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                    thr[g_thread_offset] = std::thread(thr_nms2, g_block.id, g_thread_offset, global.G_NUM_THREADS);
                 }
                 for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
