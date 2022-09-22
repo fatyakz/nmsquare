@@ -742,7 +742,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
-    cycles = (e * e * e * e) / 2;
+    cycles = ((e * e * e * e) / 2) / threadcount;
 
     cycles /= global.var.T_CYCLES_DIVIDER;
 
