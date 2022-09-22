@@ -765,7 +765,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 
     global.cycles += t_thread.cycles / global.var.G_CYCLES_DIVIDER;
 
-    global.block[start].cycles += t_thread.cycles;
+    global.block[start].cycles += t_thread.cycles / global.var.G_CYCLES_DIVIDER;
     global.block[start].thread[offset] = t_thread;
     global.block[start].id = start;
     global.block[start].state = 2;
