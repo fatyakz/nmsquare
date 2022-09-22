@@ -744,8 +744,37 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 
     cycles = (e * e * e * e) / 2;
 
+    cycles /= global.var.T_CYCLES_DIVIDER;
+
     double cps = (double)cycles / t_time.count();
 
+
+
+    t_thread.offset = offset;
+    t_thread.step = threadcount;
+    t_thread.best.matches = best;
+    t_thread.best.m = bestm;
+    t_thread.best.n = bestn;
+    t_thread.best.e = e;
+    t_thread.best.r = start;
+    t_thread.id = start;
+    t_thread.time = t_time;
+    auto t_date = std::chrono::system_clock::now();
+    t_thread.date = std::chrono::system_clock::to_time_t(t_date);
+    t_thread.cycles = cycles;
+
+    global.cycles += t_thread.cycles / global.var.G_CYCLES_DIVIDER;
+
+    global.block[start].cycles += t_thread.cycles;
+    global.block[start].thread[offset] = t_thread;
+    global.block[start].id = start;
+    global.block[start].state = 2;
+
+
+    if (t_thread.best.matches >= global.block[start].best.matches) {
+        global.block[start].best = t_thread.best;
+    }
+    /*
     std::cout << std::fixed;
     std::cout << "best:" << best;
     std::cout << " n:" << bestn;
@@ -753,11 +782,34 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     std::cout << " cycles:" << cycles / 1000000 << "m";
     std::cout << " time:" << t_time.count();
     std::cout << " cps:" << cps / 1000000 << "m\n";
+    */
 
-    if (best > t_thread.best.matches) {
-        t_thread.best.matches = best; t_thread.best.m = bestm; t_thread.best.n = bestn;
+    std::string t_offset_spacer = "";
+    if (offset < 10) {
+        t_offset_spacer = " ";
     }
-    t_thread.id = start;
+
+    if (rmw.DigitCount(global.block[start].thread[offset].best.n) > global.var.G_MIN_WIDTH_NM) {
+        global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[start].thread[offset].best.n);
+    }
+
+    if (rmw.DigitCount(global.block[start].thread[offset].best.m) > global.var.G_MIN_WIDTH_NM) {
+        global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[start].thread[offset].best.m);
+    }
+
+    rmw.TimeStamp();
+    std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+        " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[start].thread[offset].cycles << global.var.T_CYCLES_SYMBOL <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[start].thread[offset].time.count() << global.var.T_TIME_SYMBOL <<
+        " b:" << global.block[start].thread[offset].best.matches <<
+        " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.n <<
+        " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
+        " e:" << global.block[start].thread[offset].best.e <<
+        "\n";
+
+
+
 
     tex.unlock();
 
