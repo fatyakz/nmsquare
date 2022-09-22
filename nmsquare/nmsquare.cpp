@@ -788,6 +788,9 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     if (offset < 10) {
         t_offset_spacer = " ";
     }
+    if (offset < 100) {
+        t_offset_spacer = "  ";
+    }
 
     if (rmw.DigitCount(global.block[start].thread[offset].best.n) > global.var.G_MIN_WIDTH_NM) {
         global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[start].thread[offset].best.n);
