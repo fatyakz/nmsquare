@@ -942,7 +942,7 @@ start:
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] thr:" << global.G_NUM_THREADS << 
-                " avg[cps:" << predicted_cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
+                " avg[cps:" << predicted_cps / global.var.G_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
                 " est[c:" << predicted_cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " t:" << predicted_seconds / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
                 "] PENDING...\n";
