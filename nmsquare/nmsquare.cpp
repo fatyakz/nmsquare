@@ -63,23 +63,23 @@ struct S_rmw {
 };
 
 struct S_var {
-    std::string     G_BLOCK_FILE_PATH_DEFAULT = "block.dat";
-    uint_fast64_t   T_CYCLES_DIVIDER          = 1;
-    std::string     T_CYCLES_SYMBOL           = "";
-    uint_fast64_t   B_CYCLES_DIVIDER          = 1000000;
-    std::string     B_CYCLES_SYMBOL           = "M";
-    uint_fast64_t   G_CYCLES_DIVIDER          = 1000000000;
-    std::string     G_CYCLES_SYMBOL           = "B";
-    uint_fast64_t   G_TIME_DIVIDER            = 60;
-    std::string     G_TIME_SYMBOL             = "m";
-    uint_fast64_t   G_FILESIZE_DIVIDER        = 1024;
-    std::string     G_FILESIZE_SYMBOL         = "kb";
-    std::string     T_TIME_SYMBOL             = "s";
-    uint_fast64_t   G_PRECISION               = 2;
-    uint_fast64_t   G_MIN_WIDTH               = 5;
-    uint_fast64_t   G_MIN_WIDTH_NM            = 4;
-    std::string     G_COL_SPACE               = "  ";
-    uint_fast64_t   G_AVG_CPS_RANGE           = 30;
+    std::string     G_BLOCK_PATH_DEFAULT    = "block.dat";
+    uint_fast64_t   T_CYCLES_DIVIDER        = 1;
+    std::string     T_CYCLES_SYMBOL         = "";
+    uint_fast64_t   B_CYCLES_DIVIDER        = 1000000;
+    std::string     B_CYCLES_SYMBOL         = "M";
+    uint_fast64_t   G_CYCLES_DIVIDER        = 1000000000;
+    std::string     G_CYCLES_SYMBOL         = "B";
+    uint_fast64_t   G_TIME_DIVIDER          = 60;
+    std::string     G_TIME_SYMBOL           = "m";
+    uint_fast64_t   G_FILESIZE_DIVIDER      = 1024;
+    std::string     G_FILESIZE_SYMBOL       = "kb";
+    std::string     T_TIME_SYMBOL           = "s";
+    uint_fast64_t   G_PRECISION             = 2;
+    uint_fast64_t   G_MIN_WIDTH             = 5;
+    uint_fast64_t   G_MIN_WIDTH_NM          = 4;
+    std::string     G_COL_SPACE             = "  ";
+    uint_fast64_t   G_AVG_CPS_RANGE         = 30;
 };
 
 struct S_sizelimits {
@@ -391,7 +391,8 @@ public:
         if (global.rmw.rmw_writes > 0) {
 
             TimeStamp();
-            std::cout << "WRITE" << global.var.G_COL_SPACE << "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
+            std::cout << "WRITE" << global.var.G_COL_SPACE << 
+                "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
         }  
@@ -663,7 +664,8 @@ end:
         }
 
         rmw.TimeStamp();
-        std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+        std::cout << "PROC " << global.var.G_COL_SPACE << 
+            "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
             " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
             " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
             " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
@@ -699,7 +701,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 
     for (uint_fast32_t n = 1; n < nmlimit; n++) {
         for (uint_fast32_t m = 1 + offset; m < nmlimit; m += threadcount) {
-            //if (n == m) { goto end; }
+
             if (n + m >= e) { break; }
 
             a = e + n;
@@ -774,15 +776,6 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     if (t_thread.best.matches >= global.block[start].best.matches) {
         global.block[start].best = t_thread.best;
     }
-    /*
-    std::cout << std::fixed;
-    std::cout << "best:" << best;
-    std::cout << " n:" << bestn;
-    std::cout << " m:" << bestm;
-    std::cout << " cycles:" << cycles / 1000000 << "m";
-    std::cout << " time:" << t_time.count();
-    std::cout << " cps:" << cps / 1000000 << "m\n";
-    */
 
     std::string t_offset_spacer = "  ";
     if (offset > 9) {
@@ -801,7 +794,8 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     }
 
     rmw.TimeStamp();
-    std::cout << "PROC " << global.var.G_COL_SPACE << "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
+    std::cout << "PROC " << global.var.G_COL_SPACE << 
+        "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
         " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
         " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[start].thread[offset].cycles << global.var.T_CYCLES_SYMBOL <<
         " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[start].thread[offset].time.count() << global.var.T_TIME_SYMBOL <<
@@ -810,9 +804,6 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
         " e:" << global.block[start].thread[offset].best.e <<
         "\n";
-
-
-
 
     tex.unlock();
 
@@ -849,13 +840,13 @@ reset:
     std::cin >> global.G_SYSTEM_NAME;
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_FILE_PATH_DEFAULT << "):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_PATH_DEFAULT << "):";
     std::cin >> global.G_BLOCK_FILE_PATH;
     
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << global.var.G_BLOCK_FILE_PATH_DEFAULT <<"\n";
-        global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_FILE_PATH_DEFAULT;
+        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << global.var.G_BLOCK_PATH_DEFAULT <<"\n";
+        global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_PATH_DEFAULT;
     }
 
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
@@ -944,7 +935,7 @@ start:
                 "] thr:" << global.G_NUM_THREADS << 
                 " avg[cps:" << predicted_cps << global.var.G_CYCLES_SYMBOL << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
                 " est[c:" << predicted_cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
-                " t:" << predicted_seconds / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
+                " t:" << predicted_seconds << global.var.G_TIME_SYMBOL <<
                 "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
