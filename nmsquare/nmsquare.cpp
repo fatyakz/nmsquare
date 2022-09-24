@@ -887,6 +887,7 @@ pending:
     rmw.Stat();
 
 start:
+
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
