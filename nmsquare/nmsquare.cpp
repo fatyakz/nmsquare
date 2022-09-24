@@ -412,7 +412,7 @@ public:
                 "STATS" << global.var.G_COL_SPACE <<
                 "t:" << global.time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
                 " c:" << global.cycles << global.var.G_CYCLES_SYMBOL <<
-                " cps:" << cps << global.var.B_CYCLES_SYMBOL <<
+                " cps:" << cps / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " b:" << global.best.matches <<
                 " n:" << global.best.n <<
                 " m:" << global.best.m <<
@@ -993,7 +993,7 @@ start:
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
                 " cycles:"  << global.block[g_block.id].cycles / global.var.G_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL <<
                 " time:"    << global.block[g_block.id].time.count() / global.var.G_TIME_DIVIDER << global.var.G_TIME_SYMBOL <<
-                " cps:"     << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL << "\n";
+                " cps:"     << cps / global.var.B_CYCLES_DIVIDER << global.var.G_CYCLES_SYMBOL << "\n";
 
             global.time += global.block[g_block.id].time;
 
