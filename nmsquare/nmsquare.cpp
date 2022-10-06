@@ -1011,8 +1011,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
                     //validai++;
                 }
             }
-
-            cycles++;
+            // instead of counting, use (2E-1)^2
+            //cycles++;
         }
     }
 
@@ -1034,7 +1034,9 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     t_thread.time = t_time;
     auto t_date = std::chrono::system_clock::now();
     t_thread.date = std::chrono::system_clock::to_time_t(t_date);
-    t_thread.cycles = cycles;
+    //t_thread.cycles = cycles;
+    // instead of counting, use (2E-1)^2
+    t_thread.cycles = ((2 * (r * r)) - 1) * ((2 * (r * r)) - 1);
 
     global.cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
 
