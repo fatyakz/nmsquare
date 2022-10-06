@@ -133,6 +133,59 @@ struct S_cell_index {
     S_global            global;
     S_global            file;
 
+
+
+long long check_square(long long n, long long m, long long e) {
+    long long a, b, c, d, f, g, h, i;
+    bool as{}, bs{}, cs{}, ds{}, es{}, fs{}, gs{}, hs{}, is{};
+
+    a = e + n;
+    b = e - n - m;
+    c = e + m;
+    d = e - n + m;
+    f = e + n - m;
+    g = e - m;
+    h = e + n + m;
+    i = e - n;
+
+    long long matches = 0;
+
+    auto square = [](long double x) {
+        if (x > 0) {
+            long long sr = sqrt(x);
+            return (sr * sr == x);
+        } return false;
+    };
+
+    if (square(a)) { matches++; as = 1; }
+    if (square(b)) { matches++; bs = 1; }
+    if (square(c)) { matches++; cs = 1; }
+    if (square(d)) { matches++; ds = 1; }
+    if (square(e)) { matches++; es = 1; }
+    if (square(f)) { matches++; fs = 1; }
+    if (square(g)) { matches++; gs = 1; }
+    if (square(h)) { matches++; hs = 1; }
+    if (square(i)) { matches++; is = 1; }
+
+    // legacy
+    /*
+    if (matches > threshold) {
+
+        if (as) { std::cout << "*"; } std::cout << a << ":";
+        if (bs) { std::cout << "*"; } std::cout << b << ":";
+        if (cs) { std::cout << "*"; } std::cout << c << "\n";
+        if (ds) { std::cout << "*"; } std::cout << d << ":";
+        if (es) { std::cout << "*"; } std::cout << e << ":";
+        if (fs) { std::cout << "*"; } std::cout << f << "\n";
+        if (gs) { std::cout << "*"; } std::cout << g << ":";
+        if (hs) { std::cout << "*"; } std::cout << h << ":";
+        if (is) { std::cout << "*"; } std::cout << i << "\n";
+        std::cout << "n:" << n << " m:" << m << " matches:" << matches << "\n\n";
+    }
+    */
+    return matches;
+}
+
 class C_rmw {
 public:
     uint_fast64_t                           rmw_reads;
@@ -448,6 +501,75 @@ public:
 C_rmw rmw;
 
 static std::mutex mlock;
+
+struct format {
+    long double num;
+    std::string symbol;
+};
+
+format format_seconds(long double num) {
+    format f;
+
+    if (num < 60) { f.num = num; f.symbol = "s"; }
+    if (num > 60 && num < 3600) { f.num = num / 60; f.symbol = "m"; }
+    if (num > 3600) { f.num = num / 3600; f.symbol = "h"; }
+
+    return f;
+}
+
+format format_long(unsigned long long num) {
+    format f;
+
+    if (num < 1000) { f.num = num; f.symbol = ""; return f; }
+    if (num > 1000 && num < 1000000) { f.num = num / 1000.0f; f.symbol = "k"; return f; }
+    if (num > 1000000 && num < 1000000000) { f.num = num / 1000000.0f; f.symbol = "m"; return f; }
+    if (num > 1000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; return f; }
+
+    return f;
+}
+
+void print_square(long long n, long long m, long long e) {
+    long long a, b, c, d, f, g, h, i;
+    bool as{}, bs{}, cs{}, ds{}, es{}, fs{}, gs{}, hs{}, is{};
+
+    a = e + n;
+    b = e - n - m;
+    c = e + m;
+    d = e - n + m;
+    f = e + n - m;
+    g = e - m;
+    h = e + n + m;
+    i = e - n;
+
+    auto square = [](long double x) {
+        if (x > 0) {
+            long long sr = sqrt(x);
+            return (sr * sr == x);
+        } return false;
+    };
+
+    if (square(a)) { as = 1; }
+    if (square(b)) { bs = 1; }
+    if (square(c)) { cs = 1; }
+    if (square(d)) { ds = 1; }
+    if (square(e)) { es = 1; }
+    if (square(f)) { fs = 1; }
+    if (square(g)) { gs = 1; }
+    if (square(h)) { hs = 1; }
+    if (square(i)) { is = 1; }
+
+    if (as) { std::cout << "*"; } std::cout << a << ":";
+    if (bs) { std::cout << "*"; } std::cout << b << ":";
+    if (cs) { std::cout << "*"; } std::cout << c << "\n";
+    if (ds) { std::cout << "*"; } std::cout << d << ":";
+    if (es) { std::cout << "*"; } std::cout << e << ":";
+    if (fs) { std::cout << "*"; } std::cout << f << "\n";
+    if (gs) { std::cout << "*"; } std::cout << g << ":";
+    if (hs) { std::cout << "*"; } std::cout << h << ":";
+    if (is) { std::cout << "*"; } std::cout << i << "\n";
+    std::cout << "n:" << n << " m:" << m << "\n\n";
+
+}
 
 static S_thread thr_Single(uint_fast64_t t_E, uint_fast64_t t_offset, uint_fast64_t t_step) {
 
@@ -833,6 +955,153 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 }
 
 
+static int thr_find_from_r(long long r, long long offset, long long step) {
+    S_best ffr;
+    format form;
+    S_thread t_thread;
+
+    long long a, b, c, d, e, f, g, h, i;
+    long long n, m;
+
+    e = r * r;
+    long long rlimit = sqrt(e) * 2;
+
+    unsigned long long cycles = 0;
+    long long validnm = 0;
+    long long validai = 0;
+    long long matches = 0;
+    long long best = 0;
+    long long bestn = 0;
+    long long bestm = 0;
+    long long beste = 0;
+
+    std::chrono::high_resolution_clock::time_point ffr1 = std::chrono::high_resolution_clock::now();
+
+    for (long long fn = 1; fn < rlimit; fn += step) {
+        for (long long fm = 1; fm < rlimit; fm++) {
+
+            a = fn * fn;
+            c = fm * fm;
+
+            n = a - e;
+            m = c - e;
+
+            if (n > 0 && m > 0 && n != m) {
+                //validnm++;
+
+                a = e + n;
+                b = e - n - m;
+                c = e + m;
+                d = e - n + m;
+                f = e + n - m;
+                g = e - m;
+                h = e + n + m;
+                i = e - n;
+
+                if (a > 0 && b > 0 && c > 0 && d > 0 && f > 0 && g > 0 && h > 0 && i > 0) {
+
+                    matches = check_square(n, m, e);
+                    if (matches >= best) {
+                        best = matches;
+                        bestn = n;
+                        bestm = m;
+                        beste = e;
+                    }
+
+                    //validai++;
+                }
+            }
+
+            cycles++;
+        }
+    }
+
+    std::chrono::high_resolution_clock::time_point ffr2 = std::chrono::high_resolution_clock::now();
+    auto t_time = std::chrono::duration_cast<std::chrono::duration<double>>(ffr2 - ffr1);
+
+
+
+    mlock.lock();
+
+    t_thread.offset = offset;
+    t_thread.step = step;
+    t_thread.best.matches = best;
+    t_thread.best.m = bestm;
+    t_thread.best.n = bestn;
+    t_thread.best.e = e;
+    t_thread.best.r = r;
+    t_thread.id = r;
+    t_thread.time = t_time;
+    auto t_date = std::chrono::system_clock::now();
+    t_thread.date = std::chrono::system_clock::to_time_t(t_date);
+    t_thread.cycles = cycles;
+
+    global.cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
+
+    global.block[r].cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
+    global.block[r].thread[offset] = t_thread;
+    global.block[r].id = r;
+    global.block[r].state = 2;
+
+
+    if (t_thread.best.matches >= global.block[r].best.matches) {
+        global.block[r].best = t_thread.best;
+    }
+
+    ffr.matches = best;
+    ffr.n = bestn;
+    ffr.m = bestm;
+    ffr.e = beste;
+    ffr.r = sqrt(ffr.e);
+
+    global.cycles += t_thread.cycles / global.var.B_CYCLES_DIVIDER;
+
+    cycles /= global.var.T_CYCLES_DIVIDER;
+
+    double cps = (double)cycles / t_time.count();
+
+    std::string t_offset_spacer = "  ";
+    if (offset > 9) {
+        t_offset_spacer = " ";
+    }
+    if (offset > 99) {
+        t_offset_spacer = "";
+    }
+
+    if (rmw.DigitCount(global.block[r].thread[offset].best.n) > global.var.G_MIN_WIDTH_NM) {
+        global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[r].thread[offset].best.n);
+    }
+
+    if (rmw.DigitCount(global.block[r].thread[offset].best.m) > global.var.G_MIN_WIDTH_NM) {
+        global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[r].thread[offset].best.m);
+    }
+
+    rmw.TimeStamp();
+    std::cout << "PROC " << global.var.G_COL_SPACE <<
+        "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+        " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[r].thread[offset].cycles << global.var.T_CYCLES_SYMBOL <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[r].thread[offset].time.count() << global.var.T_TIME_SYMBOL <<
+        " b:" << global.block[r].thread[offset].best.matches <<
+        " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.n <<
+        " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.m <<
+        " e:" << global.block[r].thread[offset].best.e <<
+        "\n";
+
+    mlock.unlock();
+
+    return 1;
+    // legacy
+    //long cps = cycles / t_time.count();
+
+    std::cout << "r:" << r << " cycles:" << cycles << "\n";
+    std::cout << "time:" << t_time.count() << "s cps:" << cps / 1000000 << "m \n";
+    std::cout << "validnm:" << validnm << " validai:" << validai << "\n";
+    std::cout << "best:" << best << " bestn:" << bestn << " bestm:" << bestm << "\n\n";
+
+}
+
+
 int main()
 {
     const auto processor_count = std::thread::hardware_concurrency();
@@ -854,7 +1123,7 @@ reset:
     }
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2):";
+    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2, 3:nms3):";
     std::cin >> global.G_MODE;
 
     rmw.TimeStamp();
@@ -989,6 +1258,14 @@ start:
             if (global.G_MODE == 2) {
                 for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
                     thr[g_thread_offset] = std::thread(thr_nms2, g_block.id, g_thread_offset, global.G_NUM_THREADS);
+                }
+                for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
+                    thr[g_thread_id].join();
+                }
+            }
+            if (global.G_MODE == 3) {
+                for (uint_fast64_t g_thread_offset = 0; g_thread_offset < global.G_NUM_THREADS; g_thread_offset++) {
+                    thr[g_thread_offset] = std::thread(thr_find_from_r, g_block.id, g_thread_offset, global.G_NUM_THREADS);
                 }
                 for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
