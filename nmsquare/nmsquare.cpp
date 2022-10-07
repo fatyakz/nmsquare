@@ -1197,12 +1197,18 @@ start:
     auto g_date = std::chrono::system_clock::now();
     global.date = std::chrono::system_clock::to_time_t(g_date);
 
-    if (global.block.size() < (global.G_BLOCK_START + global.G_LIMIT)) { global.block.resize(global.G_BLOCK_START + global.G_LIMIT); }
+    //dont resize global database to fit range - overloads local file
+    //if (global.block.size() < (global.G_BLOCK_START + global.G_LIMIT)) { global.block.resize(global.G_BLOCK_START + global.G_LIMIT); }
+    
 
     rmw.TimeStamp();
     std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
     for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
+
+        // replaces resizing to fit entire range
+        // if current r does not fit, resize to fit r
+        if (global.block.size() < (id)) { global.block.resize(id); }
 
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         
