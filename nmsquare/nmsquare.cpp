@@ -1208,7 +1208,7 @@ start:
 
         // replaces resizing to fit entire range
         // if current r does not fit, resize to fit r
-        if (global.block.size() < (id)) { global.block.resize(id); }
+        if (global.block.size() < (id)) { global.block.resize(id+1); }
 
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         
