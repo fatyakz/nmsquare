@@ -1138,7 +1138,8 @@ reset:
     
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " << global.var.G_BLOCK_PATH_DEFAULT <<"\n";
+        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " <<
+            global.var.G_BLOCK_PATH_DEFAULT <<"\n";
         global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_PATH_DEFAULT;
     }
 
@@ -1202,7 +1203,8 @@ start:
     
 
     rmw.TimeStamp();
-    std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
+    std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" 
+        << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
     for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
@@ -1300,7 +1302,8 @@ start:
 
             global.block[g_block.id].state = 2;
             global.rmw.rmw_writemode = 
-                "[s:" + std::to_string(global.block[g_block.id].state) + " id:" + std::to_string(g_block.id) + " (" + global.G_SYSTEM_NAME + ")]";
+                "[s:" + std::to_string(global.block[g_block.id].state) + " id:" + std::to_string(g_block.id) + 
+                " (" + global.G_SYSTEM_NAME + ")]";
 
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
@@ -1313,11 +1316,13 @@ start:
         else {
             if (global.block[id].state == 1) {
                 rmw.TimeStamp();
-                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" 
+                    << global.block[id].system_name << "), skipping...\n";
             }
             if (global.block[id].state == 2) {
                 rmw.TimeStamp();
-                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" << global.block[id].system_name << "), skipping...\n";
+                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" 
+                    << global.block[id].system_name << "), skipping...\n";
             }
         }
     }
