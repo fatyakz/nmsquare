@@ -94,7 +94,7 @@ struct S_var {
 };
 
 struct S_sizelimits {
-    static const uint_fast64_t              ss_uint64 = 18446744073709551615;
+    static const uint_fast64_t              ss_uint64 = 18446744073709551615ULL;
     const double                            sl_double = 9007199254740991;
 };
 
@@ -138,7 +138,8 @@ struct S_cell_index {
 long long check_square(long long n, long long m, long long e) {
     long long a, b, c, d, f, g, h, i;
 
-#ifdef printcheckedsquares bool as{}, bs{}, cs{}, ds{}, es{}, fs{}, gs{}, hs{}, is{};
+#ifdef printcheckedsquares 
+    bool as{}, bs{}, cs{}, ds{}, es{}, fs{}, gs{}, hs{}, is{};
 #endif
 
     a = e + n;
@@ -968,10 +969,10 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 
     e = r * r;
     long long rlimit = sqrt(e) * 2;
-
-    unsigned long long cycles = 0;
+#ifdef countvalids 
     long long validnm = 0;
     long long validai = 0;
+#endif
     long long matches = 0;
     long long best = 0;
     long long bestn = 0;
@@ -990,7 +991,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
             m = c - e;
 
             if (n > 0 && m > 0 && n != m) {
-#ifdef countvalids validnm++; 
+#ifdef countvalids 
+                validnm++; 
 #endif
 
                 a = e + n;
@@ -1012,7 +1014,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
                         beste = e;
                     }
 
-#ifdef countvalids validai++; 
+#ifdef countvalids 
+                    validai++; 
 #endif
                 }
             }
