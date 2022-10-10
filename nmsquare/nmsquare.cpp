@@ -89,7 +89,7 @@ struct S_var {
     uint_fast64_t   G_PRECISION             = 2;
     uint_fast64_t   G_MIN_WIDTH             = 5;
     uint_fast64_t   G_MIN_WIDTH_NM          = 4;
-    std::string     G_COL_SPACE             = "   ";
+    std::string     G_COL_SPACE             = "  ";
     uint_fast64_t   G_AVG_CPS_RANGE         = 30;
 };
 
@@ -502,8 +502,8 @@ public:
         if (global.rmw.rmw_writes > 0 || global.rmw.rmw_reads > 0) {
 
             double cps = 0;
-            if (((double)global.cycles * global.var.B_CYCLES_DIVIDER) / global.time.count() > 0) {
-                cps = ((double)global.cycles * 1000) / global.time.count();
+            if ((double)global.cycles / global.time.count() > 0) {
+                cps = ((double)global.cycles) / global.time.count();
             }
             else {
                 cps = 0;
