@@ -1326,6 +1326,8 @@ start:
     }
     rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
+    std::cout << "\a";
+
     goto start;
 
     return 0;
