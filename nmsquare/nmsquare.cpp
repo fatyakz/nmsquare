@@ -159,6 +159,18 @@ long long check_square(long long n, long long m, long long e) {
         } return false;
     };
 
+#ifndef printcheckedsquares
+    if (square(a)) { matches++; }
+    if (square(b)) { matches++; }
+    if (square(c)) { matches++; }
+    if (square(d)) { matches++; }
+    if (square(e)) { matches++; }
+    if (square(f)) { matches++; }
+    if (square(g)) { matches++; }
+    if (square(h)) { matches++; }
+    if (square(i)) { matches++; }
+#endif
+
 #ifdef printcheckedsquares
     if (square(a)) { matches++; as = 1; }
     if (square(b)) { matches++; bs = 1; }
