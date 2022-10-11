@@ -233,6 +233,25 @@ format format_long(unsigned long long num) {
     return f;
 }
 
+
+
+
+struct S_tag {
+    std::string S_TAG;
+    std::string TAG_COLOR;
+    std::string LINE_COLOR;
+};
+
+static S_tag tINIT;
+static S_tag tSTART;
+static S_tag tBLOCK;
+static S_tag tPROC;
+static S_tag tNMS;
+static S_tag tSTATS;
+static S_tag tSKIP;
+static S_tag tREAD;
+static S_tag tWRITE;
+
 namespace color {
     enum Code {
         FG_RED = 31,
@@ -268,11 +287,7 @@ namespace color {
     };
 }
 
-struct S_tag {
-    std::string S_TAG;
-    std::string TAG_COLOR;
-    std::string LINE_COLOR;
-};
+color::set cdef(color::FG_DEFAULT);
 
 color::set ly(color::FG_LIGHT_YELLOW);
 color::set lr(color::FG_LIGHT_RED);
@@ -281,6 +296,97 @@ color::set lgrn(color::FG_LIGHT_GREEN);
 color::set dg(color::FG_DARK_GRAY);
 color::set lcy(color::FG_LIGHT_CYAN);
 color::set def(color::FG_DEFAULT);
+
+static void TimeStamp() {
+
+    char            timestamp[50]{ 0 };
+    std::time_t     time = std::time(nullptr);
+
+    std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
+    std::cout << dg << timestamp << def << global.var.G_COL_SPACE;
+}
+
+class C_tag {
+public:
+    void INIT() {
+        tINIT.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tINIT.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tINIT.S_TAG = "INIT ";
+        TimeStamp();
+        std::cout << tINIT.TAG_COLOR << tINIT.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void START() {
+        tSTART.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tSTART.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tSTART.S_TAG = "START";
+        TimeStamp();
+        std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void BLOCK() {
+        tBLOCK.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tBLOCK.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tBLOCK.S_TAG = "BLOCK";
+        TimeStamp();
+        std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void PROC() {
+        tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tPROC.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
+        tPROC.S_TAG = "PROC ";
+        TimeStamp();
+        std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    static void NMS() {
+        tNMS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
+        tNMS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tNMS.S_TAG = "[nmSquare]";
+        std::cout << tNMS.TAG_COLOR << tNMS.S_TAG << tNMS.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void STATS() {
+        tSTATS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tSTATS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tSTATS.S_TAG = "STATS";
+        TimeStamp();
+        std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void SKIP() {
+        tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tSKIP.S_TAG = "SKIP ";
+        TimeStamp();
+        std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void READ() {
+        tREAD.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tREAD.S_TAG = "READ ";
+        TimeStamp();
+        std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void WRITE() {
+        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tWRITE.S_TAG = "WRITE";
+        TimeStamp();
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void ERROR() {
+        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
+        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tWRITE.S_TAG = "ERROR";
+        TimeStamp();
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+    void LIMIT() {
+        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
+        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tWRITE.S_TAG = "LIMIT";
+        TimeStamp();
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+    }
+};
+
+C_tag tag;
 
 class C_rmw {
 public:
@@ -296,9 +402,7 @@ public:
 
         double percent = 0;
 
-        TimeStamp();
-
-        std::cout << "LIMIT" << global.var.G_COL_SPACE;
+        tag.LIMIT();
 
         percent = (global.cycles / global.limits.ss_uint64) * 100;
         std::cout << "[g.c:" << global.cycles << "=" << percent << " ";
@@ -348,15 +452,6 @@ public:
 
         struct stat buffer;
         return (stat(name.c_str(), &buffer) == 0);
-    }
-
-    static void TimeStamp() {
-
-        char            timestamp[50]{ 0 };
-        std::time_t     time = std::time(nullptr);
-
-        std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
-        std::cout << dg << timestamp << def << global.var.G_COL_SPACE;
     }
 
     static std::vector<std::string> ReadLine(std::istream& str) {
@@ -533,9 +628,8 @@ public:
         }
         if (global.rmw.rmw_reads > 0) {
 
-            TimeStamp();
-            std::cout << ly <<
-                "READ " << global.var.G_COL_SPACE << def <<
+            tag.READ();
+            std::cout <<
                 "[<-" << global.rmw.rmw_reads << "]" <<
                 " blocks:" << global.rmw.rmw_file_blocks - 1 <<
                 " size:" << global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER << global.var.G_FILESIZE_SYMBOL <<
@@ -546,8 +640,8 @@ public:
 
         if (global.rmw.rmw_writes > 0) {
 
-            TimeStamp();
-            std::cout << ly << "WRITE" << def << global.var.G_COL_SPACE << 
+            tag.WRITE();
+            std::cout <<
                 "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
@@ -564,12 +658,8 @@ public:
                 cps = 0;
             }
 
-            TimeStamp();
-
-            
-
+            tag.STATS();
             std::cout <<
-                "STATS" << global.var.G_COL_SPACE <<
                 "t:" << format_seconds(global.time.count()).num << format_seconds(global.time.count()).symbol <<
                 " c:" << format_long(global.cycles).num << format_long(global.cycles).symbol <<
                 " cps:" << format_long(cps).num << format_long(cps).symbol <<
@@ -583,86 +673,6 @@ public:
 };
 
 C_rmw rmw;
-
-color::set cdef(color::FG_DEFAULT);
-
-static S_tag tINIT;
-static S_tag tSTART;
-static S_tag tBLOCK;
-static S_tag tPROC;
-static S_tag tNMS;
-static S_tag tSTATS;
-static S_tag tSKIP;
-static S_tag tREAD;
-static S_tag tWRITE;
-
-class C_tag {
-public:
-    void INIT() {
-        tINIT.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tINIT.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
-        tINIT.S_TAG = "INIT ";
-        rmw.TimeStamp();
-        std::cout << tINIT.TAG_COLOR << tINIT.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE << cdef;
-    }
-    void START() {
-        tSTART.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tSTART.LINE_COLOR = color::FG_DEFAULT;
-        tSTART.S_TAG = "START";
-        rmw.TimeStamp();
-        std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    void BLOCK() {
-        tBLOCK.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tBLOCK.LINE_COLOR = color::FG_DEFAULT;
-        tBLOCK.S_TAG = "BLOCK";
-        rmw.TimeStamp();
-        std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    void PROC() {
-        tPROC.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tPROC.LINE_COLOR = color::FG_DEFAULT;
-        tPROC.S_TAG = "PROC ";
-        rmw.TimeStamp();
-        std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    static void NMS() {
-        tNMS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
-        tNMS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
-        tNMS.S_TAG = "[nmSquare]";
-        std::cout << tNMS.TAG_COLOR << tNMS.S_TAG << tNMS.LINE_COLOR << global.var.G_COL_SPACE << cdef;
-    }
-    void STATS() {
-        tSTATS.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tSTATS.LINE_COLOR = color::FG_DEFAULT;
-        tSTATS.S_TAG = "STATS";
-        rmw.TimeStamp();
-        std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    void SKIP() {
-        tSKIP.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tSKIP.LINE_COLOR = color::FG_DEFAULT;
-        tSKIP.S_TAG = "SKIP ";
-        rmw.TimeStamp();
-        std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    void READ() {
-        tREAD.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tREAD.LINE_COLOR = color::FG_DEFAULT;
-        tREAD.S_TAG = "READ ";
-        rmw.TimeStamp();
-        std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-    void WRITE() {
-        tWRITE.TAG_COLOR = color::FG_LIGHT_MAGENTA;
-        tWRITE.LINE_COLOR = color::FG_DEFAULT;
-        tWRITE.S_TAG = "WRITE";
-        rmw.TimeStamp();
-        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << cdef << global.var.G_COL_SPACE;
-    }
-};
-
-C_tag tag;
 
 static std::mutex mlock;
 std::vector<std::string> cmd;
@@ -812,8 +822,8 @@ static S_thread thr_Single(uint_fast64_t t_E, uint_fast64_t t_offset, uint_fast6
             global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.m);
         }
 
-        rmw.TimeStamp();
-        std::cout << "PROC " << global.var.G_COL_SPACE << 
+        tag.PROC();
+        std::cout << 
             "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
             " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
             " c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
@@ -946,7 +956,7 @@ end:
             global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[t_E].thread[t_offset].best.m);
         }
 
-        rmw.TimeStamp();
+        TimeStamp();
         std::cout << "PROC " << global.var.G_COL_SPACE << 
             "[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
             " cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
@@ -1073,7 +1083,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
         global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[start].thread[offset].best.m);
     }
 
-    rmw.TimeStamp();
+    TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
         " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).string <<
@@ -1205,8 +1215,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
         global.var.G_MIN_WIDTH_NM = rmw.DigitCount(global.block[r].thread[offset].best.m);
     }
 
-    rmw.TimeStamp();
-    std::cout << "PROC " << global.var.G_COL_SPACE <<
+    tag.PROC();
+    std::cout <<
         "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
         " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).symbol <<
         " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).num <<
@@ -1341,7 +1351,6 @@ reset:
         return 3;
     }
 
-    //rmw.TimeStamp();
     tag.INIT();
     std::cout << "Threads" << dg <<" (" << processor_count << " cores):" << def;
     std::cin >> global.G_NUM_THREADS;
@@ -1349,28 +1358,28 @@ reset:
         return 0;
     }
 
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2, 3:nms3):";
+    tag.INIT();
+    std::cout << "Mode (0:default, 1:nines, 2:nms2, 3:nms3):";
     std::cin >> global.G_MODE;
 
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "System name:";
+    tag.INIT();
+    std::cout << "INIT " << "System name:";
     std::cin >> global.G_SYSTEM_NAME;
 
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_PATH_DEFAULT << "):";
+    tag.INIT();
+    std::cout << "INIT " << "(" << global.var.G_BLOCK_PATH_DEFAULT << "):";
     std::cin >> global.G_BLOCK_FILE_PATH;
     
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
-        rmw.TimeStamp();
-        std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " <<
+        tag.INIT();
+        std::cout << "INIT " << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " <<
             global.var.G_BLOCK_PATH_DEFAULT <<"\n";
         global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_PATH_DEFAULT;
     }
 
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
-        rmw.TimeStamp();
-        std::cout << lr << "ERROR" << def << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...\n";
+        tag.ERROR();
+        std::cout << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...\n";
         goto reset;
     }
 
@@ -1381,8 +1390,8 @@ pending:
     if (global.rmw.rmw_pending > 0) {
         std::string clear_pending = "n";
 
-        rmw.TimeStamp();
-        std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Clear pending? (y/n): "; std::cin >> clear_pending;
+        tag.INIT();
+        std::cout << "Clear pending? (y/n): "; std::cin >> clear_pending;
 
         if (clear_pending == "y") {
             for (uint_fast64_t i = 0; i < file.block.size(); i++) {
@@ -1393,8 +1402,8 @@ pending:
             }
             rmw.WriteToFile(file.block, global.G_BLOCK_FILE_PATH);
 
-            rmw.TimeStamp();
-            std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "All pending blocks reset to incomplete\n";
+            tag.INIT();
+            std::cout << "All pending blocks reset to incomplete\n";
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
             rmw.Stat();
@@ -1411,21 +1420,21 @@ start:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Start:"; std::cin >> global.G_BLOCK_START;
+    tag.INIT();
+    std::cout << "Start:"; std::cin >> global.G_BLOCK_START;
 
     if (global.G_BLOCK_START == 0) {
         goto reset;
     }
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
+    tag.INIT();
+    std::cout << "Blocks:"; std::cin >> global.G_LIMIT;
     
 
     g_date = std::chrono::system_clock::now();
     global.date = std::chrono::system_clock::to_time_t(g_date);
 
-    rmw.TimeStamp();
-    std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" 
+    tag.START();
+    std::cout << "[" << global.G_BLOCK_START << "] -> ["
         << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
 loophead:
@@ -1453,13 +1462,12 @@ loophead:
 
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
-            rmw.TimeStamp();
-
             uint_fast64_t   predicted_cycles    = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1)) * global.G_NUM_THREADS;
             double          predicted_cps       = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
             double          predicted_seconds   = predicted_cycles / predicted_cps;
 
-            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
+            tag.BLOCK();
+            std::cout << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] thr:" << global.G_NUM_THREADS << 
                 " avg[cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol <<
                 "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
@@ -1516,12 +1524,12 @@ loophead:
                 global.best = global.block[g_block.id].best;
             }
 
-            rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
 
             global.cycles += global.block[g_block.id].cycles;
 
-            std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
+            tag.BLOCK();
+            std::cout << "[" << g_block.id << "] s:COMPLETE" <<
                 " cycles:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
                 " time:"    << format_seconds(global.block[g_block.id].time.count()).num << 
                 format_seconds(global.block[g_block.id].time.count()).symbol <<
@@ -1547,13 +1555,13 @@ loophead:
         } 
         else {
             if (global.block[id].state == 1) {
-                rmw.TimeStamp();
-                std::cout << dg << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" 
+                tag.SKIP();
+                std::cout << "[" << id << "] PENDING  ("
                     << global.block[id].system_name << "), skipping...\n" << def;
             }
             if (global.block[id].state == 2) {
-                rmw.TimeStamp();
-                std::cout << dg << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" 
+                tag.SKIP();
+                std::cout << "[" << id << "] COMPLETE ("
                     << global.block[id].system_name << "), skipping...\n" << def;
             }
         }
