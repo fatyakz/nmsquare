@@ -87,8 +87,8 @@ struct S_var {
     std::string     G_FILESIZE_SYMBOL       = "kb";
     std::string     T_TIME_SYMBOL           = "s";
     uint_fast64_t   G_PRECISION             = 2;
-    uint_fast64_t   G_MIN_WIDTH             = 5;
-    uint_fast64_t   G_MIN_WIDTH_NM          = 4;
+    uint_fast64_t   G_MIN_WIDTH             = 2;
+    uint_fast64_t   G_MIN_WIDTH_NM          = 5;
     std::string     G_COL_SPACE             = "  ";
     uint_fast64_t   G_AVG_CPS_RANGE         = 30;
 };
@@ -1023,8 +1023,6 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 #endif
                 }
             }
-            // instead of counting, use (2E-1)^2
-            //cycles++;
         }
     }
 
@@ -1044,8 +1042,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     t_thread.time = t_time;
     auto t_date = std::chrono::system_clock::now();
     t_thread.date = std::chrono::system_clock::to_time_t(t_date);
-    //t_thread.cycles = cycles;
-    // instead of counting, use (2E-1)^2
+
     t_thread.cycles = ((r + r) - 1) * ((r + r) - 1);
 
     
@@ -1086,17 +1083,16 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     rmw.TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).string <<
+        " cps:" << std::setw(2) << format_long(cps).string <<
         " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).string <<
         " b:" << global.block[r].thread[offset].best.matches <<
         " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.n <<
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.m <<
         " e:" << global.block[r].thread[offset].best.e << 
-        "(" << format_long(global.block[r].thread[offset].best.e).string << ")" <<
+        "(" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].best.e).string << ")" <<
         "\n";
 
     mlock.unlock();
-
    
 #ifdef countvalids
     std::cout << "r:" << r << " cycles:" << cycles << "\n";
@@ -1177,10 +1173,12 @@ int main(int argc, char** argv)
     std::cout << std::setw(global.var.G_MIN_WIDTH);
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     
-    for (int i = 0; i < argc; ++i)
+    for (int i = 0; i < argc; ++i) {
         cmd.push_back(argv[i]);
+    }
 
 reset:
+
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
