@@ -1326,7 +1326,7 @@ loophead:
 
             rmw.TimeStamp();
 
-            uint_fast64_t   predicted_cycles    = (g_block.id * g_block.id * g_block.id * g_block.id) / 2;
+            uint_fast64_t   predicted_cycles    = ((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1);
             double          predicted_cps       = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
             double          predicted_seconds   = predicted_cycles / predicted_cps;
 
