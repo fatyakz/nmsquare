@@ -1188,16 +1188,23 @@ reset:
     if (read_args(cmd) == 0) {
         global.date = std::chrono::system_clock::to_time_t(g_date);
         global.time = std::chrono::milliseconds::zero();
+
         global.cycles = 0;
+
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
+        cmd.clear();
+
         goto loophead;
     }
     else if (read_args(cmd) == 1) {
+        cmd.clear();
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
+
         goto start;
     }
     else if (read_args(cmd) == 3) {
         std::cout << "Command line argument error\n";
+
         return 3;
     }
 
