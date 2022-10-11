@@ -1109,7 +1109,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 }
 
 int read_args(std::vector<std::string> args) {
-    bool f{}, s{}, t{}, r{}, b{}, m{}, q{};
+    bool f{}, s{}, t{}, r{}, b{}, m{};
 
     for (long unsigned int i = 0; i < args.size(); i++) {
         if (args[i] == "-f") {
@@ -1147,17 +1147,14 @@ int read_args(std::vector<std::string> args) {
 
         if (args[i] == "-q") {
             global.G_QUIT = 1;
-            q = 1;
         }
     }
 
     if (f && s && t && m) {
         if (r && b) {
-            //all set
             return 0;
         }
         else if (!r && !b) {
-            // goto start
             return 1;
         }
         
