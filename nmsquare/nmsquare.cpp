@@ -242,7 +242,6 @@ namespace color {
         BG_RED = 41,
         BG_GREEN = 42,
         BG_BLUE = 44,
-        FG_DEFAULT = 39, 
         FG_BLACK = 30, 
         FG_YELLOW = 33, 
         FG_MAGENTA = 35, 
@@ -269,6 +268,14 @@ namespace color {
     };
 }
 
+color::set ly(color::FG_LIGHT_YELLOW);
+color::set lr(color::FG_LIGHT_RED);
+color::set lg(color::FG_LIGHT_GRAY);
+color::set lgrn(color::FG_LIGHT_GREEN);
+color::set dg(color::FG_DARK_GRAY);
+color::set lcy(color::FG_LIGHT_CYAN);
+color::set def(color::FG_DEFAULT);
+
 class C_rmw {
 public:
     uint_fast64_t                           rmw_reads;
@@ -282,7 +289,6 @@ public:
     static void CheckLimits(uint_fast64_t id) {
 
         double percent = 0;
-
 
         TimeStamp();
 
@@ -344,7 +350,7 @@ public:
         std::time_t     time = std::time(nullptr);
 
         std::strftime(timestamp, 30, "[%H:%M:%S]", std::localtime(&time));
-        std::cout << timestamp << global.var.G_COL_SPACE;
+        std::cout << dg << timestamp << def << global.var.G_COL_SPACE;
     }
 
     static std::vector<std::string> ReadLine(std::istream& str) {
@@ -522,8 +528,8 @@ public:
         if (global.rmw.rmw_reads > 0) {
 
             TimeStamp();
-            std::cout <<
-                "READ " << global.var.G_COL_SPACE <<
+            std::cout << lgrn <<
+                "READ " << global.var.G_COL_SPACE << def <<
                 "[<-" << global.rmw.rmw_reads << "]" <<
                 " blocks:" << global.rmw.rmw_file_blocks - 1 <<
                 " size:" << global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER << global.var.G_FILESIZE_SYMBOL <<
@@ -535,7 +541,7 @@ public:
         if (global.rmw.rmw_writes > 0) {
 
             TimeStamp();
-            std::cout << "WRITE" << global.var.G_COL_SPACE << 
+            std::cout << lgrn << "WRITE" << def << global.var.G_COL_SPACE << 
                 "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
@@ -553,6 +559,8 @@ public:
             }
 
             TimeStamp();
+
+            
 
             std::cout <<
                 "STATS" << global.var.G_COL_SPACE <<
@@ -1220,11 +1228,11 @@ reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    std::cout << "[nmSquare]";
+    std::cout << lcy << "[nmSquare]" << def;
     if (cmd.size() > 1) {
-        std::cout << global.var.G_COL_SPACE << "( ";
+        std::cout << dg << global.var.G_COL_SPACE << "( ";
         for (auto i : cmd) { std::cout << i << " "; }
-        std::cout << ")";
+        std::cout << ")" << def;
     }
     std::cout << "\n";
 
@@ -1252,34 +1260,34 @@ reset:
     }
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
     std::cin >> global.G_NUM_THREADS;
     if (global.G_NUM_THREADS == 0) {
         return 0;
     }
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2, 3:nms3):";
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Mode (0:default, 1:nines, 2:nms2, 3:nms3):";
     std::cin >> global.G_MODE;
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "System name:";
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "System name:";
     std::cin >> global.G_SYSTEM_NAME;
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_PATH_DEFAULT << "):";
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "(" << global.var.G_BLOCK_PATH_DEFAULT << "):";
     std::cin >> global.G_BLOCK_FILE_PATH;
     
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "INIT " << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " <<
+        std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << global.G_BLOCK_FILE_PATH << " does not exist, reverting to default: " <<
             global.var.G_BLOCK_PATH_DEFAULT <<"\n";
         global.G_BLOCK_FILE_PATH = global.var.G_BLOCK_PATH_DEFAULT;
     }
 
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "ERROR" << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...\n";
+        std::cout << lr << "ERROR" << def << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...\n";
         goto reset;
     }
 
@@ -1291,7 +1299,7 @@ pending:
         std::string clear_pending = "n";
 
         rmw.TimeStamp();
-        std::cout << "INIT " << global.var.G_COL_SPACE << "Clear pending? (y/n): "; std::cin >> clear_pending;
+        std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Clear pending? (y/n): "; std::cin >> clear_pending;
 
         if (clear_pending == "y") {
             for (uint_fast64_t i = 0; i < file.block.size(); i++) {
@@ -1303,7 +1311,7 @@ pending:
             rmw.WriteToFile(file.block, global.G_BLOCK_FILE_PATH);
 
             rmw.TimeStamp();
-            std::cout << "INIT " << global.var.G_COL_SPACE << "All pending blocks reset to incomplete\n";
+            std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "All pending blocks reset to incomplete\n";
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
             rmw.Stat();
@@ -1321,13 +1329,13 @@ start:
     global.cycles = 0;
 
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Start:"; std::cin >> global.G_BLOCK_START;
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Start:"; std::cin >> global.G_BLOCK_START;
 
     if (global.G_BLOCK_START == 0) {
         goto reset;
     }
     rmw.TimeStamp();
-    std::cout << "INIT " << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
     g1 = std::chrono::high_resolution_clock::now();
 
     g_date = std::chrono::system_clock::now();
@@ -1456,13 +1464,13 @@ loophead:
         else {
             if (global.block[id].state == 1) {
                 rmw.TimeStamp();
-                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" 
-                    << global.block[id].system_name << "), skipping...\n";
+                std::cout << dg << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] PENDING  (" 
+                    << global.block[id].system_name << "), skipping...\n" << def;
             }
             if (global.block[id].state == 2) {
                 rmw.TimeStamp();
-                std::cout << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" 
-                    << global.block[id].system_name << "), skipping...\n";
+                std::cout << dg << "SKIP " << global.var.G_COL_SPACE << "[" << id << "] COMPLETE (" 
+                    << global.block[id].system_name << "), skipping...\n" << def;
             }
         }
     }
