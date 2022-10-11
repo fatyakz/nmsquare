@@ -1260,7 +1260,7 @@ reset:
     }
 
     rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
+    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Threads" << dg <<" (" << processor_count << " cores):" << def;
     std::cin >> global.G_NUM_THREADS;
     if (global.G_NUM_THREADS == 0) {
         return 0;
@@ -1442,7 +1442,7 @@ loophead:
                 format_seconds(global.block[g_block.id].time.count()).symbol <<
                 " cps:"     << format_long(cps).num << format_long(cps).symbol << "\n";
 
-            global.time += global.block[g_block.id].time;
+            //global.time += global.block[g_block.id].time;
 
             rmw.Stat();
 
