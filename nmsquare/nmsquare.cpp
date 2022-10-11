@@ -1083,7 +1083,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     rmw.TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).num <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).symbol <<
         " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).num <<
         format_seconds(global.block[r].thread[offset].time.count()).symbol <<
         " b:" << global.block[r].thread[offset].best.matches <<
