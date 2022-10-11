@@ -1155,7 +1155,6 @@ reset:
 
     rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
-
 pending:
 
     if (global.rmw.rmw_pending > 0) {
