@@ -528,7 +528,7 @@ public:
         if (global.rmw.rmw_reads > 0) {
 
             TimeStamp();
-            std::cout << lgrn <<
+            std::cout << ly <<
                 "READ " << global.var.G_COL_SPACE << def <<
                 "[<-" << global.rmw.rmw_reads << "]" <<
                 " blocks:" << global.rmw.rmw_file_blocks - 1 <<
@@ -541,7 +541,7 @@ public:
         if (global.rmw.rmw_writes > 0) {
 
             TimeStamp();
-            std::cout << lgrn << "WRITE" << def << global.var.G_COL_SPACE << 
+            std::cout << ly << "WRITE" << def << global.var.G_COL_SPACE << 
                 "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
@@ -1454,7 +1454,8 @@ loophead:
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
 
-            global.time = g_total_time;
+            global.time += g_total_time;
+            
 
 #ifdef checklimits
             rmw.CheckLimits(g_block.id);
