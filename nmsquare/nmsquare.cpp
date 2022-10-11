@@ -1193,6 +1193,7 @@ reset:
         goto loophead;
     }
     else if (read_args(cmd) == 1) {
+        rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         goto start;
     }
     else if (read_args(cmd) == 3) {
