@@ -1289,7 +1289,7 @@ start:
             rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
 
-            //global.cycles += global.block[g_block.id].cycles;
+            global.cycles += global.block[g_block.id].cycles;
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
                 " cycles:"  << format_long(global.block[g_block.id].cycles).string <<
