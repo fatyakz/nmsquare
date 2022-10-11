@@ -1189,6 +1189,7 @@ reset:
         global.date = std::chrono::system_clock::to_time_t(g_date);
         global.time = std::chrono::milliseconds::zero();
         global.cycles = 0;
+        rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
         goto loophead;
     }
     else if (read_args(cmd) == 1) {
