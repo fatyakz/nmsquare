@@ -1181,9 +1181,13 @@ reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    std::cout << "[nmSquare]" << global.var.G_COL_SPACE << "( ";
-    for (auto i : cmd) { std::cout << i << " "; }
-    std::cout << ")\n";
+    std::cout << "[nmSquare]";
+    if (cmd.size() > 1) {
+        std::cout << global.var.G_COL_SPACE << "( ";
+        for (auto i : cmd) { std::cout << i << " "; }
+        std::cout << ")";
+    }
+    std::cout << "\n";
 
     if (read_args(cmd) == 0) {
         global.date = std::chrono::system_clock::to_time_t(g_date);
