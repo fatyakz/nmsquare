@@ -1083,13 +1083,15 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     rmw.TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(2) << format_long(cps).string <<
-        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).string <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).num <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).num <<
+        format_seconds(global.block[r].thread[offset].time.count()).symbol <<
         " b:" << global.block[r].thread[offset].best.matches <<
         " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.n <<
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.m <<
         " e:" << global.block[r].thread[offset].best.e << 
-        "(" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].best.e).string << ")" <<
+        "(" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].best.e).num <<
+        format_long(global.block[r].thread[offset].best.e).symbol << ")" <<
         "\n";
 
     mlock.unlock();
@@ -1390,9 +1392,10 @@ loophead:
             global.cycles += global.block[g_block.id].cycles;
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
-                " cycles:"  << format_long(global.block[g_block.id].cycles).num <<
-                " time:"    << format_seconds(global.block[g_block.id].time.count()).string <<
-                " cps:"     << format_long(cps).string << "\n";
+                " cycles:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
+                " time:"    << format_seconds(global.block[g_block.id].time.count()).num << 
+                format_seconds(global.block[g_block.id].time.count()).symbol <<
+                " cps:"     << format_long(cps).num << format_long(cps).symbol << "\n";
 
             global.time += global.block[g_block.id].time;
 
