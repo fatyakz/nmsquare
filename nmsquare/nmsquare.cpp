@@ -1332,9 +1332,10 @@ loophead:
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] thr:" << global.G_NUM_THREADS << 
-                " avg[cps:" << format_long(predicted_cps).string << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
-                " est[c:" << format_long(predicted_cycles).string <<
-                " t:" << format_long(predicted_seconds).string <<
+                " avg[cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol <<
+                "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
+                " est[c:" << format_long(predicted_cycles).num << format_long(predicted_cycles).symbol <<
+                " t:" << format_seconds(predicted_seconds).num << format_seconds(predicted_seconds).symbol <<
                 "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
