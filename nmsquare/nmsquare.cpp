@@ -268,6 +268,11 @@ namespace color {
     };
 }
 
+struct S_tag {
+    std::string S_TAG;
+    color::Code C_COLOR;
+};
+
 color::set ly(color::FG_LIGHT_YELLOW);
 color::set lr(color::FG_LIGHT_RED);
 color::set lg(color::FG_LIGHT_GRAY);
@@ -576,11 +581,81 @@ public:
     }
 };
 
+color::set cdef(color::FG_DEFAULT);
 C_rmw rmw;
+
+class C_tag {
+public:
+    static S_tag tINIT;
+    static S_tag tSTART;
+    static S_tag tBLOCK;
+    static S_tag tPROC;
+    static S_tag tNMS;
+    static S_tag tSTATS;
+    static S_tag tSKIP;
+    static S_tag tREAD;
+    static S_tag tWRITE;
+
+    void INIT() {
+        tINIT.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tINIT.S_TAG = "INIT ";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tINIT.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void START() {
+        tSTART.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTART.S_TAG = "START";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tSTART.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void BLOCK() {
+        tBLOCK.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tBLOCK.S_TAG = "BLOCK";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tBLOCK.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void PROC() {
+        tPROC.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tPROC.S_TAG = "PROC ";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tPROC.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void NMS() {
+        tNMS.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tNMS.S_TAG = "[nmSquare]";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tNMS.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void STATS() {
+        tSTATS.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTATS.S_TAG = "STATS";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tSTATS.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void SKIP() {
+        tSKIP.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSKIP.S_TAG = "SKIP ";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tSKIP.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void READ() {
+        tREAD.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tREAD.S_TAG = "READ ";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tREAD.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+    void WRITE() {
+        tWRITE.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tWRITE.S_TAG = "WRITE";
+        rmw.TimeStamp();
+        std::cout << tINIT.C_COLOR << tWRITE.S_TAG << cdef << global.var.G_COL_SPACE;
+    }
+};
+
+C_tag tag;
 
 static std::mutex mlock;
 std::vector<std::string> cmd;
-
 
 void print_square(long long n, long long m, long long e) {
     long long a, b, c, d, f, g, h, i;
@@ -878,7 +953,6 @@ end:
     return t_thread;
 }
 
-
 static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
     S_thread t_thread;
 
@@ -1006,7 +1080,6 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     return t_thread;
 }
 
-
 static int thr_find_from_r(long long r, long long offset, long long step) {
     S_best ffr;
     format form;
@@ -1089,12 +1162,10 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 
     t_thread.cycles = ((r + r) - 1) * ((r + r) - 1);
 
-    
     global.block[r].cycles += t_thread.cycles;
     global.block[r].thread[offset] = t_thread;
     global.block[r].id = r;
     global.block[r].state = 2;
-
 
     if (t_thread.best.matches >= global.block[r].best.matches) {
         global.block[r].best = t_thread.best;
@@ -1228,7 +1299,8 @@ reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    std::cout << lcy << "[nmSquare]" << def;
+    //tag nms
+    tag.NMS();
     if (cmd.size() > 1) {
         std::cout << dg << global.var.G_COL_SPACE << "( ";
         for (auto i : cmd) { std::cout << i << " "; }
