@@ -534,7 +534,7 @@ public:
 C_rmw rmw;
 
 static std::mutex mlock;
-
+std::vector<std::string> cmd;
 
 
 void print_square(long long n, long long m, long long e) {
@@ -1108,7 +1108,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 }
 
 
-int main()
+
+int main(int argc, char** argv)
 {
     const auto processor_count = std::thread::hardware_concurrency();
 
@@ -1116,11 +1117,17 @@ int main()
     std::cout << std::setw(global.var.G_MIN_WIDTH);
     std::cout.setf(std::ios::fixed, std::ios::floatfield);
     
+    for (int i = 0; i < argc; ++i)
+        cmd.push_back(argv[i]);
+
 reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    std::cout << "[nmSquare]\n";
+    std::cout << "[nmSquare]" << global.var.G_COL_SPACE << "( ";
+    for (auto i : cmd) { std::cout << i << " "; }
+    std::cout << ")\n";
+
     rmw.TimeStamp();
     std::cout << "INIT " << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
     std::cin >> global.G_NUM_THREADS;
