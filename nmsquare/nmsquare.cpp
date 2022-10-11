@@ -520,9 +520,9 @@ public:
 
             std::cout <<
                 "STATS" << global.var.G_COL_SPACE <<
-                "t:" << format_seconds(global.time.count()).string <<
-                " c:" << format_long(global.cycles).string << 
-                " cps:" << format_long(cps).string <<
+                "t:" << format_seconds(global.time.count()).num << format_seconds(global.time.count()).symbol <<
+                " c:" << format_long(global.cycles).num << format_long(global.cycles).symbol <<
+                " cps:" << format_long(cps).num << format_long(cps).symbol <<
                 " b:" << global.best.matches <<
                 " n:" << global.best.n <<
                 " m:" << global.best.m <<
