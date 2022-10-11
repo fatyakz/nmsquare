@@ -1238,8 +1238,6 @@ reset:
 
     if (read_args(cmd) == 0) {
         global.date = std::chrono::system_clock::to_time_t(g_date);
-        global.time = std::chrono::milliseconds::zero();
-
         global.cycles = 0;
 
         rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
@@ -1336,7 +1334,7 @@ start:
     }
     rmw.TimeStamp();
     std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
-    g1 = std::chrono::high_resolution_clock::now();
+    
 
     g_date = std::chrono::system_clock::now();
     global.date = std::chrono::system_clock::to_time_t(g_date);
@@ -1350,6 +1348,8 @@ loophead:
     cmd.clear();
 
     for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
+
+        g1 = std::chrono::high_resolution_clock::now();
 
         if (global.block.size() < (id + 1)) { global.block.resize(id+1); }
 
@@ -1441,8 +1441,6 @@ loophead:
                 " time:"    << format_seconds(global.block[g_block.id].time.count()).num << 
                 format_seconds(global.block[g_block.id].time.count()).symbol <<
                 " cps:"     << format_long(cps).num << format_long(cps).symbol << "\n";
-
-            //global.time += global.block[g_block.id].time;
 
             rmw.Stat();
 
