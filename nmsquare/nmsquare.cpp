@@ -202,6 +202,7 @@ long long check_square(long long n, long long m, long long e) {
 struct format {
     long double num;
     std::string symbol;
+    std::string string;
 };
 
 format format_seconds(long double num) {
@@ -210,6 +211,8 @@ format format_seconds(long double num) {
     if (num < 60) { f.num = num; f.symbol = "s"; }
     if (num > 60 && num < 3600) { f.num = num / 60; f.symbol = "m"; }
     if (num > 3600) { f.num = num / 3600; f.symbol = "h"; }
+
+    f.string = std::to_string(f.num) + f.symbol;
 
     return f;
 }
@@ -223,6 +226,8 @@ format format_long(unsigned long long num) {
     if (num > 1000000000 && num < 1000000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; return f; }
     if (num > 1000000000000 && num < 1000000000000000) { f.num = num / 1000000000000.0f; f.symbol = "t"; return f; }
     if (num > 1000000000000000) { f.num = num / 1000000000000000.0f; f.symbol = "q"; return f; }
+
+    f.string = std::to_string(f.num) + f.symbol;
 
     return f;
 }
@@ -514,9 +519,9 @@ public:
 
             std::cout <<
                 "STATS" << global.var.G_COL_SPACE <<
-                "t:" << format_seconds(global.time.count()).num <<
-                " c:" << format_long(global.cycles).num << format_long(global.cycles).symbol <<
-                " cps:" << format_long(cps).num << format_long(cps).symbol <<
+                "t:" << format_seconds(global.time.count()).string <<
+                " c:" << format_long(global.cycles).string << 
+                " cps:" << format_long(cps).string <<
                 " b:" << global.best.matches <<
                 " n:" << global.best.n <<
                 " m:" << global.best.m <<
@@ -942,11 +947,9 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     rmw.TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).symbol <<
-        " c:" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[start].thread[offset].cycles).num
-        << format_long(global.block[start].thread[offset].cycles).symbol <<
-        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[start].thread[offset].time.count()).num 
-        << format_seconds(global.block[start].thread[offset].time.count()).symbol <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).string <<
+        " c:" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[start].thread[offset].cycles).string <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[start].thread[offset].time.count()).string <<
         " b:" << global.block[start].thread[offset].best.matches <<
         " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.n <<
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
@@ -1082,15 +1085,13 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     rmw.TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).symbol <<
-        " c:" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].cycles).num
-        << format_long(global.block[r].thread[offset].cycles).symbol <<
-        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).num
-        << format_seconds(global.block[r].thread[offset].time.count()).symbol <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).string <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).string <<
         " b:" << global.block[r].thread[offset].best.matches <<
         " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.n <<
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.m <<
-        " e:" << global.block[r].thread[offset].best.e <<
+        " e:" << global.block[r].thread[offset].best.e << 
+        "(" << format_long(global.block[r].thread[offset].best.e).string << ")" <<
         "\n";
 
     mlock.unlock();
@@ -1232,9 +1233,9 @@ start:
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
                 "] thr:" << global.G_NUM_THREADS << 
-                " avg[cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
-                " est[c:" << format_long(predicted_cycles).num << format_long(predicted_cycles).symbol <<
-                " t:" << format_long(predicted_seconds).num << format_long(predicted_seconds).symbol <<
+                " avg[cps:" << format_long(predicted_cps).string << "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
+                " est[c:" << format_long(predicted_cycles).string <<
+                " t:" << format_long(predicted_seconds).string <<
                 "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
@@ -1292,10 +1293,9 @@ start:
             global.cycles += global.block[g_block.id].cycles;
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
-                " cycles:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
-                " time:"    << format_seconds(global.block[g_block.id].time.count()).num << 
-                format_seconds(global.block[g_block.id].time.count()).symbol <<
-                " cps:"     << format_long(cps).num << format_long(cps).symbol << "\n";
+                " cycles:"  << format_long(global.block[g_block.id].cycles).string <<
+                " time:"    << format_seconds(global.block[g_block.id].time.count()).string <<
+                " cps:"     << format_long(cps).string << "\n";
 
             global.time += global.block[g_block.id].time;
 
