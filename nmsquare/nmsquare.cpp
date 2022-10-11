@@ -1413,7 +1413,8 @@ loophead:
 
     std::cout << "\a";
 
-    goto start;
-
+    if (read_args(cmd) < 3) {
+        goto start;
+    }
     return 0;
 }
