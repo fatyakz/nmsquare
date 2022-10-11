@@ -1110,7 +1110,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 int read_args(std::vector<std::string> args) {
     bool f{}, s{}, t{}, r{}, b{}, m{};
 
-    for (int i = 0; i < args.size(); i++) {
+    for (long unsigned int i = 0; i < args.size(); i++) {
         if (args[i] == "-f") {
             global.G_BLOCK_FILE_PATH = args[i + 1];
             if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
@@ -1159,6 +1159,8 @@ int read_args(std::vector<std::string> args) {
     else {
         return 2;
     }
+
+    return 3;
 }
 
 
@@ -1185,13 +1187,16 @@ reset:
 
     if (read_args(cmd) == 0) {
         global.date = std::chrono::system_clock::to_time_t(g_date);
-        std::chrono::high_resolution_clock::time_point g1 = std::chrono::high_resolution_clock::now();
         global.time = std::chrono::milliseconds::zero();
         global.cycles = 0;
         goto loophead;
     }
     else if (read_args(cmd) == 1) {
         goto start;
+    }
+    else if (read_args(cmd) == 3) {
+        std::cout << "Command line argument error\n";
+        return 3;
     }
 
     rmw.TimeStamp();
