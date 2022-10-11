@@ -1286,6 +1286,9 @@ start:
         << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
 loophead:
+
+    cmd.clear();
+
     for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
         if (global.block.size() < (id + 1)) { global.block.resize(id+1); }
