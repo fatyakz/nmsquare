@@ -270,7 +270,8 @@ namespace color {
 
 struct S_tag {
     std::string S_TAG;
-    color::Code C_COLOR;
+    std::string TAG_COLOR;
+    std::string LINE_COLOR;
 };
 
 color::set ly(color::FG_LIGHT_YELLOW);
@@ -581,74 +582,83 @@ public:
     }
 };
 
-color::set cdef(color::FG_DEFAULT);
 C_rmw rmw;
+
+color::set cdef(color::FG_DEFAULT);
+
+static S_tag tINIT;
+static S_tag tSTART;
+static S_tag tBLOCK;
+static S_tag tPROC;
+static S_tag tNMS;
+static S_tag tSTATS;
+static S_tag tSKIP;
+static S_tag tREAD;
+static S_tag tWRITE;
 
 class C_tag {
 public:
-    static S_tag tINIT;
-    static S_tag tSTART;
-    static S_tag tBLOCK;
-    static S_tag tPROC;
-    static S_tag tNMS;
-    static S_tag tSTATS;
-    static S_tag tSKIP;
-    static S_tag tREAD;
-    static S_tag tWRITE;
-
     void INIT() {
-        tINIT.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tINIT.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tINIT.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
         tINIT.S_TAG = "INIT ";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tINIT.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tINIT.TAG_COLOR << tINIT.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE << cdef;
     }
     void START() {
-        tSTART.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTART.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTART.LINE_COLOR = color::FG_DEFAULT;
         tSTART.S_TAG = "START";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tSTART.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << cdef << global.var.G_COL_SPACE;
     }
     void BLOCK() {
-        tBLOCK.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tBLOCK.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tBLOCK.LINE_COLOR = color::FG_DEFAULT;
         tBLOCK.S_TAG = "BLOCK";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tBLOCK.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << cdef << global.var.G_COL_SPACE;
     }
     void PROC() {
-        tPROC.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tPROC.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tPROC.LINE_COLOR = color::FG_DEFAULT;
         tPROC.S_TAG = "PROC ";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tPROC.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << cdef << global.var.G_COL_SPACE;
     }
-    void NMS() {
-        tNMS.C_COLOR = color::FG_LIGHT_MAGENTA;
+    static void NMS() {
+        tNMS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
+        tNMS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
         tNMS.S_TAG = "[nmSquare]";
-        rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tNMS.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tNMS.TAG_COLOR << tNMS.S_TAG << tNMS.LINE_COLOR << global.var.G_COL_SPACE << cdef;
     }
     void STATS() {
-        tSTATS.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTATS.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tSTATS.LINE_COLOR = color::FG_DEFAULT;
         tSTATS.S_TAG = "STATS";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tSTATS.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << cdef << global.var.G_COL_SPACE;
     }
     void SKIP() {
-        tSKIP.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tSKIP.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tSKIP.LINE_COLOR = color::FG_DEFAULT;
         tSKIP.S_TAG = "SKIP ";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tSKIP.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << cdef << global.var.G_COL_SPACE;
     }
     void READ() {
-        tREAD.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tREAD.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tREAD.LINE_COLOR = color::FG_DEFAULT;
         tREAD.S_TAG = "READ ";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tREAD.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << cdef << global.var.G_COL_SPACE;
     }
     void WRITE() {
-        tWRITE.C_COLOR = color::FG_LIGHT_MAGENTA;
+        tWRITE.TAG_COLOR = color::FG_LIGHT_MAGENTA;
+        tWRITE.LINE_COLOR = color::FG_DEFAULT;
         tWRITE.S_TAG = "WRITE";
         rmw.TimeStamp();
-        std::cout << tINIT.C_COLOR << tWRITE.S_TAG << cdef << global.var.G_COL_SPACE;
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << cdef << global.var.G_COL_SPACE;
     }
 };
 
@@ -1299,11 +1309,13 @@ reset:
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
 
-    //tag nms
     tag.NMS();
+
     if (cmd.size() > 1) {
-        std::cout << dg << global.var.G_COL_SPACE << "( ";
-        for (auto i : cmd) { std::cout << i << " "; }
+        std::cout << dg << "( ";
+        for (int i = 1; i < cmd.size(); ++i) {
+            std::cout << cmd[i] << " ";
+        }
         std::cout << ")" << def;
     }
     std::cout << "\n";
@@ -1329,8 +1341,9 @@ reset:
         return 3;
     }
 
-    rmw.TimeStamp();
-    std::cout << ly << "INIT " << def << global.var.G_COL_SPACE << "Threads" << dg <<" (" << processor_count << " cores):" << def;
+    //rmw.TimeStamp();
+    tag.INIT();
+    std::cout << "Threads" << dg <<" (" << processor_count << " cores):" << def;
     std::cin >> global.G_NUM_THREADS;
     if (global.G_NUM_THREADS == 0) {
         return 0;
