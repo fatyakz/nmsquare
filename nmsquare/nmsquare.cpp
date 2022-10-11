@@ -1254,9 +1254,11 @@ pending:
         }
     }
 
-    rmw.Stat();
+    
 
 start:
+
+    rmw.Stat();
 
     global.time = std::chrono::milliseconds::zero();
     global.cycles = 0;
