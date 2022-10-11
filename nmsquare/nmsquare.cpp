@@ -1107,11 +1107,66 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     return 1;
 }
 
+int read_args(std::vector<std::string> args) {
+    bool f{}, s{}, t{}, r{}, b{}, m{};
+
+    for (int i = 0; i < args.size(); i++) {
+        if (args[i] == "-f") {
+            global.G_BLOCK_FILE_PATH = args[i + 1];
+            if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
+                std::ofstream output(global.G_BLOCK_FILE_PATH);
+            }
+            f = 1;
+        }
+
+        if (args[i] == "-s") {
+            global.G_SYSTEM_NAME = args[i + 1];
+            s = 1;
+        }
+
+        if (args[i] == "-t") {
+            global.G_NUM_THREADS = stoi(args[i + 1]);
+            t = 1;
+        }
+
+        if (args[i] == "-r") {
+            global.G_BLOCK_START = stoi(args[i + 1]);
+            r = 1;
+        }
+
+        if (args[i] == "-b") {
+            global.G_LIMIT = stoi(args[i + 1]);
+            b = 1;
+        }
+
+        if (args[i] == "-m") {
+            global.G_MODE = stoi(args[i + 1]);
+            m = 1;
+        }
+    }
+
+    if (f && s && t && m) {
+        if (r && b) {
+            //all set
+            return 0;
+        }
+        else if (!r && !b) {
+            // goto start
+            return 1;
+        }
+        
+    }
+    else {
+        return 2;
+    }
+}
 
 
 int main(int argc, char** argv)
 {
     const auto processor_count = std::thread::hardware_concurrency();
+    std::chrono::high_resolution_clock::time_point g1;
+    auto g_date = std::chrono::system_clock::now();
 
     std::cout << std::setprecision(global.var.G_PRECISION);
     std::cout << std::setw(global.var.G_MIN_WIDTH);
@@ -1119,6 +1174,17 @@ int main(int argc, char** argv)
     
     for (int i = 0; i < argc; ++i)
         cmd.push_back(argv[i]);
+
+    if (read_args(cmd) == 0) {
+        global.date = std::chrono::system_clock::to_time_t(g_date);
+        std::chrono::high_resolution_clock::time_point g1 = std::chrono::high_resolution_clock::now();
+        global.time = std::chrono::milliseconds::zero();
+        global.cycles = 0;
+        goto loophead;
+    }
+    else if (read_args(cmd) == 1) {
+        goto start;
+    }
 
 reset:
     global.time = std::chrono::milliseconds::zero();
@@ -1156,7 +1222,7 @@ reset:
 
     if (!rmw.FileExists(global.G_BLOCK_FILE_PATH)) {
         rmw.TimeStamp();
-        std::cout << "ERROR" << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...";
+        std::cout << "ERROR" << global.var.G_COL_SPACE << "!" << global.G_BLOCK_FILE_PATH << " does not exist. Restarting...\n";
         goto reset;
     }
 
@@ -1203,15 +1269,16 @@ start:
     }
     rmw.TimeStamp();
     std::cout << "INIT " << global.var.G_COL_SPACE << "Blocks:"; std::cin >> global.G_LIMIT;
-    std::chrono::high_resolution_clock::time_point g1 = std::chrono::high_resolution_clock::now();
+    g1 = std::chrono::high_resolution_clock::now();
 
-    auto g_date = std::chrono::system_clock::now();
+    g_date = std::chrono::system_clock::now();
     global.date = std::chrono::system_clock::to_time_t(g_date);
 
     rmw.TimeStamp();
     std::cout << "START" << global.var.G_COL_SPACE << "[" << global.G_BLOCK_START << "] -> [" 
         << global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
 
+loophead:
     for (uint_fast64_t id = global.G_BLOCK_START; id < global.G_BLOCK_START + global.G_LIMIT; id++) {
 
         if (global.block.size() < (id + 1)) { global.block.resize(id+1); }
