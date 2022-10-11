@@ -1289,7 +1289,7 @@ start:
             rmw.TimeStamp();
             double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
 
-            global.cycles += global.block[g_block.id].cycles;
+            //global.cycles += global.block[g_block.id].cycles;
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
                 " cycles:"  << format_long(global.block[g_block.id].cycles).string <<
@@ -1307,6 +1307,8 @@ start:
 
             std::chrono::high_resolution_clock::time_point g2 = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double> g_total_time = std::chrono::duration_cast<std::chrono::duration<double>>(g2 - g1);
+
+            global.time = g_total_time;
 
 #ifdef checklimits
             rmw.CheckLimits(g_block.id);
