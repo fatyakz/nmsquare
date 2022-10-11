@@ -114,6 +114,7 @@ public:
     uint_fast64_t                           G_NUM_THREADS;
     std::string                             G_SYSTEM_NAME;
     uint_fast64_t                           G_MODE;
+    bool                                    G_QUIT;
 };
 
 struct S_cell_index {
@@ -1108,7 +1109,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 }
 
 int read_args(std::vector<std::string> args) {
-    bool f{}, s{}, t{}, r{}, b{}, m{};
+    bool f{}, s{}, t{}, r{}, b{}, m{}, q{};
 
     for (long unsigned int i = 0; i < args.size(); i++) {
         if (args[i] == "-f") {
@@ -1142,6 +1143,11 @@ int read_args(std::vector<std::string> args) {
         if (args[i] == "-m") {
             global.G_MODE = stoi(args[i + 1]);
             m = 1;
+        }
+
+        if (args[i] == "-q") {
+            global.G_QUIT = 1;
+            q = 1;
         }
     }
 
@@ -1429,8 +1435,11 @@ loophead:
 
     std::cout << "\a";
 
-    if (read_args(cmd) < 3) {
-        goto start;
+    if (global.G_QUIT) {
+        return 0;
     }
+
+    goto start;
+
     return 0;
 }
