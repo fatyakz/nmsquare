@@ -131,6 +131,12 @@ struct S_cell_index {
     uint_fast64_t                           b_system_name = 10;
 };
 
+struct format {
+    long double num;
+    std::string symbol;
+    std::string string;
+};
+
     S_cell_index        cell_index;
     S_global            global;
     S_global            file;
@@ -199,12 +205,6 @@ long long check_square(long long n, long long m, long long e) {
     return matches;
 }
 
-struct format {
-    long double num;
-    std::string symbol;
-    std::string string;
-};
-
 format format_seconds(long double num) {
     format f;
 
@@ -220,12 +220,12 @@ format format_seconds(long double num) {
 format format_long(unsigned long long num) {
     format f;
 
-    if (num < 1000) { f.num = num; f.symbol = ""; return f; }
-    if (num > 1000 && num < 1000000) { f.num = num / 1000.0f; f.symbol = "k"; return f; }
-    if (num > 1000000 && num < 1000000000) { f.num = num / 1000000.0f; f.symbol = "m"; return f; }
-    if (num > 1000000000 && num < 1000000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; return f; }
-    if (num > 1000000000000 && num < 1000000000000000) { f.num = num / 1000000000000.0f; f.symbol = "t"; return f; }
-    if (num > 1000000000000000) { f.num = num / 1000000000000000.0f; f.symbol = "q"; return f; }
+    if (num < 1000) { f.num = num; f.symbol = ""; }
+    if (num > 1000 && num < 1000000) { f.num = num / 1000.0f; f.symbol = "k"; }
+    if (num > 1000000 && num < 1000000000) { f.num = num / 1000000.0f; f.symbol = "m"; }
+    if (num > 1000000000 && num < 1000000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; }
+    if (num > 1000000000000 && num < 1000000000000000) { f.num = num / 1000000000000.0f; f.symbol = "t"; }
+    if (num > 1000000000000000) { f.num = num / 1000000000000000.0f; f.symbol = "q"; }
 
     f.string = std::to_string(f.num) + f.symbol;
 
@@ -1175,6 +1175,14 @@ int main(int argc, char** argv)
     for (int i = 0; i < argc; ++i)
         cmd.push_back(argv[i]);
 
+reset:
+    global.time = std::chrono::milliseconds::zero();
+    global.cycles = 0;
+
+    std::cout << "[nmSquare]" << global.var.G_COL_SPACE << "( ";
+    for (auto i : cmd) { std::cout << i << " "; }
+    std::cout << ")\n";
+
     if (read_args(cmd) == 0) {
         global.date = std::chrono::system_clock::to_time_t(g_date);
         std::chrono::high_resolution_clock::time_point g1 = std::chrono::high_resolution_clock::now();
@@ -1185,14 +1193,6 @@ int main(int argc, char** argv)
     else if (read_args(cmd) == 1) {
         goto start;
     }
-
-reset:
-    global.time = std::chrono::milliseconds::zero();
-    global.cycles = 0;
-
-    std::cout << "[nmSquare]" << global.var.G_COL_SPACE << "( ";
-    for (auto i : cmd) { std::cout << i << " "; }
-    std::cout << ")\n";
 
     rmw.TimeStamp();
     std::cout << "INIT " << global.var.G_COL_SPACE << "Threads (" << processor_count << " cores):";
@@ -1368,7 +1368,7 @@ loophead:
             global.cycles += global.block[g_block.id].cycles;
 
             std::cout << "BLOCK" << global.var.G_COL_SPACE << "[" << g_block.id << "] s:COMPLETE" <<
-                " cycles:"  << format_long(global.block[g_block.id].cycles).string <<
+                " cycles:"  << format_long(global.block[g_block.id].cycles).num <<
                 " time:"    << format_seconds(global.block[g_block.id].time.count()).string <<
                 " cps:"     << format_long(cps).string << "\n";
 
