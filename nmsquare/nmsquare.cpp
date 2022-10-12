@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <regex>
+#include <stack>
 
 struct S_best {
 public:
@@ -206,53 +207,6 @@ long long check_square(long long n, long long m, long long e) {
     return matches;
 }
 
-format format_seconds(long double num) {
-    format f;
-
-    if (num < 60) { f.num = num; f.symbol = "s"; }
-    if (num > 60 && num < 3600) { f.num = num / 60; f.symbol = "m"; }
-    if (num > 3600) { f.num = num / 3600; f.symbol = "h"; }
-
-    f.string = std::to_string(f.num) + f.symbol;
-
-    return f;
-}
-
-format format_long(unsigned long long num) {
-    format f;
-
-    if (num < 1000) { f.num = num; f.symbol = ""; }
-    if (num > 1000 && num < 1000000) { f.num = num / 1000.0f; f.symbol = "k"; }
-    if (num > 1000000 && num < 1000000000) { f.num = num / 1000000.0f; f.symbol = "m"; }
-    if (num > 1000000000 && num < 1000000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; }
-    if (num > 1000000000000 && num < 1000000000000000) { f.num = num / 1000000000000.0f; f.symbol = "t"; }
-    if (num > 1000000000000000) { f.num = num / 1000000000000000.0f; f.symbol = "q"; }
-
-    f.string = std::to_string(f.num) + f.symbol;
-
-    return f;
-}
-
-
-
-
-struct S_tag {
-    std::string S_TAG;
-    std::string TAG_COLOR;
-    std::string LINE_COLOR;
-};
-
-static S_tag tINIT;
-static S_tag tSTART;
-static S_tag tBLOCK;
-static S_tag tPROC;
-static S_tag tNMS;
-static S_tag tSTATS;
-static S_tag tSKIP;
-static S_tag tREAD;
-static S_tag tWRITE;
-static S_tag tERROR;
-
 namespace color {
     enum Code {
         FG_RED = 31,
@@ -262,19 +216,19 @@ namespace color {
         BG_RED = 41,
         BG_GREEN = 42,
         BG_BLUE = 44,
-        FG_BLACK = 30, 
-        FG_YELLOW = 33, 
-        FG_MAGENTA = 35, 
-        FG_CYAN = 36, 
-        FG_LIGHT_GRAY = 37, 
-        FG_DARK_GRAY = 90, 
-        FG_LIGHT_RED = 91, 
-        FG_LIGHT_GREEN = 92, 
-        FG_LIGHT_YELLOW = 93, 
-        FG_LIGHT_BLUE = 94, 
-        FG_LIGHT_MAGENTA = 95, 
-        FG_LIGHT_CYAN = 96, 
-        FG_WHITE = 97, 
+        FG_BLACK = 30,
+        FG_YELLOW = 33,
+        FG_MAGENTA = 35,
+        FG_CYAN = 36,
+        FG_LIGHT_GRAY = 37,
+        FG_DARK_GRAY = 90,
+        FG_LIGHT_RED = 91,
+        FG_LIGHT_GREEN = 92,
+        FG_LIGHT_YELLOW = 93,
+        FG_LIGHT_BLUE = 94,
+        FG_LIGHT_MAGENTA = 95,
+        FG_LIGHT_CYAN = 96,
+        FG_WHITE = 97,
         BG_DEFAULT = 49
     };
     class set {
@@ -288,7 +242,107 @@ namespace color {
     };
 }
 
-color::set cdef(color::FG_DEFAULT);
+
+
+struct S_tag {
+    std::string S_TAG;
+    std::string TAG_COLOR;
+    std::string LINE_COLOR;
+};
+
+format format_seconds(long double num, S_tag tag) {
+    std::ostringstream oss;
+
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+
+    format f;
+
+    if (num < 60) { f.num = num; f.symbol = "s"; }
+    if (num > 60 && num < 3600) { f.num = num / 60; f.symbol = "m"; }
+    if (num > 3600) { f.num = num / 3600; f.symbol = "h"; }
+
+    oss.setf(std::ios::fixed, std::ios::floatfield);
+    oss.precision(global.var.G_PRECISION);
+    oss << NUM_COLOR << f.num << SYM_COLOR << f.symbol << tag.LINE_COLOR;
+
+    f.string = oss.str();
+
+    return f;
+}
+
+format format_long(unsigned long long num, S_tag tag) {
+    std::ostringstream oss;
+
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+
+    format f;
+
+    if (num < 1000) { f.num = num; f.symbol = ""; }
+    if (num > 1000 && num < 1000000) { f.num = num / 1000.0f; f.symbol = "k"; }
+    if (num > 1000000 && num < 1000000000) { f.num = num / 1000000.0f; f.symbol = "m"; }
+    if (num > 1000000000 && num < 1000000000000) { f.num = num / 1000000000.0f; f.symbol = "b"; }
+    if (num > 1000000000000 && num < 1000000000000000) { f.num = num / 1000000000000.0f; f.symbol = "t"; }
+    if (num > 1000000000000000) { f.num = num / 1000000000000000.0f; f.symbol = "q"; }
+
+    oss.setf(std::ios::fixed, std::ios::floatfield);
+    oss.precision(global.var.G_PRECISION);
+    oss << NUM_COLOR << f.num << SYM_COLOR << f.symbol << tag.LINE_COLOR;
+
+    f.string = oss.str();
+
+    return f;
+}
+
+format format_commas(unsigned long long num, S_tag tag) {
+    std::ostringstream oss;
+    std::vector<std::string> digits;
+
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+
+    format f;
+
+    uint_fast64_t r, n = num, count = 0;
+
+    oss << NUM_COLOR;
+
+    while (n > 0) {
+        int digit = n % 10;
+        n /= 10;
+        
+        digits.insert(digits.begin(), std::to_string(digit));
+
+        count++;
+
+        if (count == 3 && n > 0) {
+            digits.insert(digits.begin(), ",");
+            count = 0;
+        }
+    }
+
+    for (auto i : digits) {
+        oss << i;
+    }
+
+    oss << tag.LINE_COLOR;
+
+    f.string = oss.str();
+
+    return f;
+}
+
+static S_tag tINIT;
+static S_tag tSTART;
+static S_tag tBLOCK;
+static S_tag tPROC;
+static S_tag tNMS;
+static S_tag tSTATS;
+static S_tag tSKIP;
+static S_tag tREAD;
+static S_tag tWRITE;
+static S_tag tERROR;
 
 color::set ly(color::FG_LIGHT_YELLOW);
 color::set lr(color::FG_LIGHT_RED);
@@ -632,11 +686,11 @@ public:
             tag.READ();
             std::cout <<
                 "[<-" << global.rmw.rmw_reads << "]" <<
-                " blocks:" << global.rmw.rmw_file_blocks - 1 <<
-                " size:" << global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER << global.var.G_FILESIZE_SYMBOL <<
-                " complete:" << global.rmw.rmw_completed <<
-                " pending:" << global.rmw.rmw_pending <<
-                " incomplete:" << global.rmw.rmw_incomplete - 1 << "\n";
+                " blocks:" << format_commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
+                " size:" << format_commas(global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER, tREAD).string << global.var.G_FILESIZE_SYMBOL <<
+                " complete:" << format_commas(global.rmw.rmw_completed, tREAD).string <<
+                " pending:" << format_commas(global.rmw.rmw_pending, tREAD).string <<
+                " incomplete:" << format_commas(global.rmw.rmw_incomplete - 1, tREAD).string << "\n";
         }
 
         if (global.rmw.rmw_writes > 0) {
@@ -661,14 +715,14 @@ public:
 
             tag.STATS();
             std::cout <<
-                "[t:" << format_seconds(global.time.count()).num << format_seconds(global.time.count()).symbol <<
-                " c:" << format_long(global.cycles).num << format_long(global.cycles).symbol <<
-                " cps:" << format_long(cps).num << format_long(cps).symbol <<
-                "] [b:" << global.best.matches <<
-                " n:" << global.best.n <<
-                " m:" << global.best.m <<
-                " e:" << global.best.e <<
-                " r:" << global.best.r << "]\n";
+                "[t:" << format_seconds(global.time.count(), tSTATS).string <<
+                " c:" << format_long(global.cycles, tSTATS).string <<
+                " cps:" << format_long(cps, tSTATS).string <<
+                "] [b:" << format_commas(global.best.matches, tSTATS).string <<
+                " n:" << format_commas(global.best.n, tSTATS).string <<
+                " m:" << format_commas(global.best.m, tSTATS).string <<
+                " e:" << format_commas(global.best.e, tSTATS).string <<
+                " r:" << format_commas(global.best.r, tSTATS).string << "]\n";
         }
     }
 };
@@ -1087,9 +1141,9 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
     TimeStamp();
     std::cout << "PROC " << global.var.G_COL_SPACE <<
         "[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).string <<
-        " c:" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[start].thread[offset].cycles).string <<
-        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[start].thread[offset].time.count()).string <<
+        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps, tPROC).string <<
+        " c:" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[start].thread[offset].cycles, tPROC).string <<
+        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[start].thread[offset].time.count(), tPROC).string <<
         " b:" << global.block[start].thread[offset].best.matches <<
         " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.n <<
         " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
@@ -1218,16 +1272,14 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 
     tag.PROC();
     std::cout <<
-        "[r:" << global.block[r].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-        " cps:" << std::setw(global.var.G_MIN_WIDTH) << format_long(cps).num << format_long(cps).symbol <<
-        " t:" << std::setw(global.var.G_MIN_WIDTH) << format_seconds(global.block[r].thread[offset].time.count()).num <<
-        format_seconds(global.block[r].thread[offset].time.count()).symbol <<
-        " b:" << global.block[r].thread[offset].best.matches <<
-        " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.n <<
-        " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[r].thread[offset].best.m <<
-        " e:" << global.block[r].thread[offset].best.e << 
-        "(" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].best.e).num <<
-        format_long(global.block[r].thread[offset].best.e).symbol << ")" <<
+        "[r:" << format_commas(global.block[r].thread[offset].id, tPROC).string << t_offset_spacer << "+" << offset << "]" <<
+        " cps:" << format_long(cps, tPROC).string <<
+        " t:" << format_seconds(global.block[r].thread[offset].time.count(), tPROC).string <<
+        " b:" << format_commas(global.block[r].thread[offset].best.matches, tPROC).string <<
+        " n:" << std::setw(global.var.G_MIN_WIDTH_NM) << format_commas(global.block[r].thread[offset].best.n, tPROC).string <<
+        " m:" << std::setw(global.var.G_MIN_WIDTH_NM) << format_commas(global.block[r].thread[offset].best.m, tPROC).string <<
+        " e:" << format_commas(global.block[r].thread[offset].best.e, tPROC).string <<
+        " (" << std::setw(global.var.G_MIN_WIDTH) << format_long(global.block[r].thread[offset].best.e, tPROC).string << ")" <<
         "\n";
 
     mlock.unlock();
@@ -1473,17 +1525,18 @@ loophead:
 
             for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
                 predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1)) * global.G_NUM_THREADS;
-                predicted_total_seconds += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE));
+                predicted_total_seconds += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
+                    / global.G_NUM_THREADS;
             }
-
+            
             tag.BLOCK();
             std::cout << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
-                " [avg cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol <<
+                " [avg cps:" << format_long(predicted_cps, tBLOCK).string << 
                 "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
-                " [est c:" << format_long(predicted_cycles).num << format_long(predicted_cycles).symbol <<
-                "/" << format_long(predicted_total_cycles).num << format_long(predicted_total_cycles).symbol <<
-                " t:" << format_seconds(predicted_seconds).num << format_seconds(predicted_seconds).symbol <<
-                "/" << format_seconds(predicted_total_seconds).num << format_seconds(predicted_total_seconds).symbol <<
+                " [est c:" << format_long(predicted_cycles, tBLOCK).string <<
+                "/" << format_long(predicted_total_cycles, tBLOCK).string <<
+                " t:" << format_seconds(predicted_seconds, tBLOCK).string <<
+                "/" << format_seconds(predicted_total_seconds, tBLOCK).string <<
                 "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
@@ -1541,10 +1594,9 @@ loophead:
 
             tag.BLOCK();
             std::cout << "[" << g_block.id << "] COMPLETE" <<
-                " [c:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
-                " t:"    << format_seconds(global.block[g_block.id].time.count()).num << 
-                format_seconds(global.block[g_block.id].time.count()).symbol <<
-                " cps:"     << format_long(cps).num << format_long(cps).symbol << "]\n";
+                " [c:"  << format_long(global.block[g_block.id].cycles, tBLOCK).string <<
+                " t:"    << format_seconds(global.block[g_block.id].time.count(), tBLOCK).string <<
+                " cps:"     << format_long(cps, tBLOCK).string << "]\n";
 
             rmw.Stat();
 
