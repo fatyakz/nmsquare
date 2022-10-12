@@ -89,8 +89,7 @@ struct S_var {
     uint_fast64_t   G_PRECISION             = 2;
     uint_fast64_t   G_MIN_WIDTH             = 2;
     uint_fast64_t   G_MIN_WIDTH_NM          = 5;
-    //std::string     G_COL_SPACE             = "  ";
-    std::string     G_COL_SPACE             = " | ";
+    std::string     G_COL_SPACE             = "  ";
     uint_fast64_t   G_AVG_CPS_RANGE         = 30;
 };
 
