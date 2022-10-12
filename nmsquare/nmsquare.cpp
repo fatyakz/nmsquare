@@ -1473,7 +1473,7 @@ loophead:
 
             for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
                 // calculate total cycles for all future blocks
-                predicted_total_cycles      += (((i + i) - 1) * ((i + i) - 1)) * global.G_NUM_THREADS;
+                predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1));// *global.G_NUM_THREADS;
                 predicted_total_seconds     += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
                     / global.G_NUM_THREADS;
             }
