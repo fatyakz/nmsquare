@@ -1534,7 +1534,8 @@ loophead:
             }
             
             tag.BLOCK();
-            std::cout << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
+            std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "/" << 
+                format_commas(global.G_BLOCK_START, tBLOCK).string + format_commas(global.G_LIMIT - 1, tBLOCK).string <<
                 " [avg cps:" << format_long(predicted_cps, tBLOCK).string << 
                 "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
                 " [est c:" << format_long(predicted_cycles, tBLOCK).string <<
@@ -1597,7 +1598,7 @@ loophead:
             global.cycles += global.block[g_block.id].cycles;
 
             tag.BLOCK();
-            std::cout << "[" << g_block.id << "] COMPLETE" <<
+            std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "] COMPLETE" <<
                 " [c:"  << format_long(global.block[g_block.id].cycles, tBLOCK).string <<
                 " t:"    << format_seconds(global.block[g_block.id].time.count(), tBLOCK).string <<
                 " cps:"     << format_long(cps, tBLOCK).string << "]\n";
