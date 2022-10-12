@@ -1559,12 +1559,6 @@ loophead:
                 predicted_total_seconds += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
                     / global.G_NUM_THREADS;
             }
-            
-            if (global.G_CLEAR) {
-                if (!std::system("clear")) {
-                    std::cout << "!Error clearing screen!";
-                }
-            }
 
             tag.BLOCK();
             std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "/" << 
@@ -1616,6 +1610,13 @@ loophead:
                 }
                 for (uint_fast64_t g_thread_id = 0; g_thread_id < global.G_NUM_THREADS; g_thread_id++) {
                     thr[g_thread_id].join();
+                }
+            }
+
+
+            if (global.G_CLEAR) {
+                if (!std::system("clear")) {
+                    std::cout << "";
                 }
             }
 
