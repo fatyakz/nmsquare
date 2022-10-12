@@ -254,7 +254,7 @@ format format_seconds(long double num, S_tag tag) {
     std::ostringstream oss;
 
     std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
-    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 
     format f;
 
@@ -275,7 +275,7 @@ format format_long(unsigned long long num, S_tag tag) {
     std::ostringstream oss;
 
     std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
-    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 
     format f;
 
@@ -300,13 +300,13 @@ format format_commas(unsigned long long num, S_tag tag) {
     std::vector<std::string> digits;
 
     std::string NUM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
-    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_BLUE) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 
     format f;
 
     uint_fast64_t n = num, count = 0;
 
-    oss << NUM_COLOR;
+    
 
     while (n > 0) {
         int digit = n % 10;
@@ -317,10 +317,14 @@ format format_commas(unsigned long long num, S_tag tag) {
         count++;
 
         if (count == 3 && n > 0) {
+            digits.insert(digits.begin(), NUM_COLOR);
             digits.insert(digits.begin(), ",");
+            digits.insert(digits.begin(), SYM_COLOR);
             count = 0;
         }
     }
+
+    oss << NUM_COLOR;
 
     for (auto i : digits) {
         oss << i;
