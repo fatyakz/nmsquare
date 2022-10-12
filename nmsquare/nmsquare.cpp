@@ -295,6 +295,27 @@ format format_long(unsigned long long num, S_tag tag) {
     return f;
 }
 
+format format_filesize(unsigned long long num, S_tag tag) {
+    std::ostringstream oss;
+
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
+
+    format f;
+
+    if (num < 1024) { f.num = num; f.symbol = "b"; }
+    if (num > 1024 && num < 1048576) { f.num = num / 1024.0f; f.symbol = "kb"; }
+    if (num > 1048576) { f.num = num / 1048576.0f; f.symbol = "mb"; }
+
+    oss.setf(std::ios::fixed, std::ios::floatfield);
+    oss.precision(global.var.G_PRECISION);
+    oss << NUM_COLOR << f.num << SYM_COLOR << f.symbol << tag.LINE_COLOR;
+
+    f.string = oss.str();
+
+    return f;
+}
+
 format format_commas(unsigned long long num, S_tag tag) {
     std::ostringstream oss;
     std::vector<std::string> digits;
@@ -691,7 +712,7 @@ public:
             std::cout <<
                 "[<-" << global.rmw.rmw_reads << "]" <<
                 " blocks:" << format_commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
-                " size:" << format_commas(global.rmw.rmw_file_size / global.var.G_FILESIZE_DIVIDER, tREAD).string << global.var.G_FILESIZE_SYMBOL <<
+                " size:" << format_filesize(global.rmw.rmw_file_size, tREAD).string << 
                 " complete:" << format_commas(global.rmw.rmw_completed, tREAD).string <<
                 " pending:" << format_commas(global.rmw.rmw_pending, tREAD).string <<
                 " incomplete:" << format_commas(global.rmw.rmw_incomplete - 1, tREAD).string << "\n";
@@ -701,7 +722,8 @@ public:
 
             tag.WRITE();
             std::cout <<
-                "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << "\n";
+                "[->" << global.rmw.rmw_writes << "] " << global.rmw.rmw_writemode << " -> " << path << " (" << 
+                format_filesize(global.rmw.rmw_file_size, tREAD).string << ")\n";
             WriteToFile(file.block, path);
             global.rmw.rmw_writemode = "";
         }  
