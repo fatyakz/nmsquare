@@ -1466,7 +1466,7 @@ loophead:
 
             uint_fast64_t   predicted_cycles        = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1)) * global.G_NUM_THREADS;
             double          predicted_cps           = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
-            double          predicted_seconds       = predicted_cycles / predicted_cps;
+            double          predicted_seconds       = (predicted_cycles / predicted_cps) / global.G_NUM_THREADS;
             uint_fast64_t   predicted_total_cycles  = 0;
             double          predicted_total_seconds = 0.0f;
 
