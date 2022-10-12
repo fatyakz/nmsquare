@@ -251,6 +251,7 @@ static S_tag tSTATS;
 static S_tag tSKIP;
 static S_tag tREAD;
 static S_tag tWRITE;
+static S_tag tERROR;
 
 namespace color {
     enum Code {
@@ -320,21 +321,21 @@ public:
         tSTART.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
         tSTART.S_TAG = "START";
         TimeStamp();
-        std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << tSTART.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void BLOCK() {
-        tBLOCK.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tBLOCK.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tBLOCK.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
+        tBLOCK.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
         tBLOCK.S_TAG = "BLOCK";
         TimeStamp();
-        std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << tBLOCK.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void PROC() {
-        tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
+        tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_GRAY) + "m";
         tPROC.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
         tPROC.S_TAG = "PROC ";
         TimeStamp();
-        std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << tPROC.LINE_COLOR << global.var.G_COL_SPACE;
     }
     static void NMS() {
         tNMS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
@@ -344,45 +345,45 @@ public:
     }
     void STATS() {
         tSTATS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tSTATS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tSTATS.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
         tSTATS.S_TAG = "STATS";
         TimeStamp();
-        std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tSTATS.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void SKIP() {
-        tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
+        tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
         tSKIP.S_TAG = "SKIP ";
         TimeStamp();
-        std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << tSKIP.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void READ() {
-        tREAD.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tREAD.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
+        tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
         tREAD.S_TAG = "READ ";
         TimeStamp();
-        std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << tREAD.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void WRITE() {
-        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
-        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
+        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
         tWRITE.S_TAG = "WRITE";
         TimeStamp();
-        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tWRITE.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void ERROR() {
-        tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
-        tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
-        tWRITE.S_TAG = "ERROR";
+        tERROR.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
+        tERROR.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+        tERROR.S_TAG = "ERROR";
         TimeStamp();
-        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tERROR.TAG_COLOR << tERROR.S_TAG << tERROR.LINE_COLOR << global.var.G_COL_SPACE;
     }
     void LIMIT() {
         tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
         tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
         tWRITE.S_TAG = "LIMIT";
         TimeStamp();
-        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
+        std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tWRITE.LINE_COLOR << global.var.G_COL_SPACE;
     }
 };
 
@@ -442,7 +443,7 @@ public:
 
         if (t_cycles > 0 && t_time.count() > 0) {
 
-            t_cps = (double)t_cycles / t_time.count();
+            t_cps = ((double)t_cycles / t_time.count()) / global.G_NUM_THREADS;
         }
 
         return t_cps;
@@ -562,16 +563,16 @@ public:
             std::istringstream csv_buffer(line_buffer);
             std::vector<std::string> cells_buffer = ReadLine(csv_buffer);
 
-            block_buffer[line_index].best.n         = stoi(cells_buffer[cell_index.b_n]);
-            block_buffer[line_index].best.m         = stoi(cells_buffer[cell_index.b_m]);
-            block_buffer[line_index].best.e         = stoi(cells_buffer[cell_index.b_e]);
-            block_buffer[line_index].best.r         = stoi(cells_buffer[cell_index.b_r]);
-            block_buffer[line_index].best.matches   = stoi(cells_buffer[cell_index.b_matches]);
+            block_buffer[line_index].best.n         = stoll(cells_buffer[cell_index.b_n]);
+            block_buffer[line_index].best.m         = stoll(cells_buffer[cell_index.b_m]);
+            block_buffer[line_index].best.e         = stoll(cells_buffer[cell_index.b_e]);
+            block_buffer[line_index].best.r         = stoll(cells_buffer[cell_index.b_r]);
+            block_buffer[line_index].best.matches   = stoll(cells_buffer[cell_index.b_matches]);
             block_buffer[line_index].cycles         = stoll(cells_buffer[cell_index.b_cycles]);
-            block_buffer[line_index].date           = stoi(cells_buffer[cell_index.b_date]);
-            block_buffer[line_index].id             = stoi(cells_buffer[cell_index.b_id]);
-            block_buffer[line_index].state          = stoi(cells_buffer[cell_index.b_state]);
-            block_buffer[line_index].time           = seconds_to_duration(stod(cells_buffer[cell_index.b_time]));
+            block_buffer[line_index].date           = stoll(cells_buffer[cell_index.b_date]);
+            block_buffer[line_index].id             = stoll(cells_buffer[cell_index.b_id]);
+            block_buffer[line_index].state          = stoll(cells_buffer[cell_index.b_state]);
+            block_buffer[line_index].time           = seconds_to_duration(stold(cells_buffer[cell_index.b_time]));
 
             std::string sys_name = cells_buffer[cell_index.b_system_name];
 
@@ -652,7 +653,7 @@ public:
 
             double cps = 0;
             if ((double)global.cycles / global.time.count() > 0) {
-                cps = ((double)global.cycles) / global.time.count();
+                cps = (((double)global.cycles) / global.time.count()) / global.G_NUM_THREADS;
             }
             else {
                 cps = 0;
@@ -1197,7 +1198,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
     ffr.e = beste;
     ffr.r = sqrt(ffr.e);
 
-    double cps = (double)t_thread.cycles / t_time.count();
+    double cps = ((double)t_thread.cycles / t_time.count()) / global.G_NUM_THREADS;
 
     std::string t_offset_spacer = "  ";
     if (offset > 9) {
@@ -1264,12 +1265,12 @@ int read_args(std::vector<std::string> args) {
         }
 
         if (args[i] == "-r") {
-            global.G_BLOCK_START = stoi(args[i + 1]);
+            global.G_BLOCK_START = stoll(args[i + 1]);
             r = 1;
         }
 
         if (args[i] == "-b") {
-            global.G_LIMIT = stoi(args[i + 1]);
+            global.G_LIMIT = stoll(args[i + 1]);
             b = 1;
         }
 
@@ -1426,6 +1427,7 @@ start:
     if (global.G_BLOCK_START == 0) {
         goto reset;
     }
+
     tag.INIT();
     std::cout << "Blocks:"; std::cin >> global.G_LIMIT;
     
@@ -1462,17 +1464,27 @@ loophead:
 
             rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
-            uint_fast64_t   predicted_cycles    = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1)) * global.G_NUM_THREADS;
-            double          predicted_cps       = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
-            double          predicted_seconds   = predicted_cycles / predicted_cps;
+            uint_fast64_t   predicted_cycles        = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1)) * global.G_NUM_THREADS;
+            double          predicted_cps           = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
+            double          predicted_seconds       = predicted_cycles / predicted_cps;
+            uint_fast64_t   predicted_total_cycles  = 0;
+            double          predicted_total_seconds = 0.0f;
+
+
+            for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
+                // calculate total cycles for all future blocks
+                predicted_total_cycles      += (((i + i) - 1) * ((i + i) - 1)) * global.G_NUM_THREADS;
+                predicted_total_seconds     += predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
+            }
 
             tag.BLOCK();
             std::cout << "[" << g_block.id << "/" << global.G_BLOCK_START + global.G_LIMIT - 1 <<
-                "] thr:" << global.G_NUM_THREADS << 
-                " avg[cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol <<
+                " [avg cps:" << format_long(predicted_cps).num << format_long(predicted_cps).symbol <<
                 "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
-                " est[c:" << format_long(predicted_cycles).num << format_long(predicted_cycles).symbol <<
+                " [est c:" << format_long(predicted_cycles).num << format_long(predicted_cycles).symbol <<
+                "/" << format_long(predicted_total_cycles).num << format_long(predicted_total_cycles).symbol <<
                 " t:" << format_seconds(predicted_seconds).num << format_seconds(predicted_seconds).symbol <<
+                "/" << format_seconds(predicted_total_seconds).num << format_seconds(predicted_total_seconds).symbol <<
                 "] PENDING...\n";
 
             global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
@@ -1524,16 +1536,16 @@ loophead:
                 global.best = global.block[g_block.id].best;
             }
 
-            double cps = (double)global.block[g_block.id].cycles / global.block[g_block.id].time.count(); 
+            double cps = ((double)global.block[g_block.id].cycles / global.block[g_block.id].time.count()) / global.G_NUM_THREADS;
 
             global.cycles += global.block[g_block.id].cycles;
 
             tag.BLOCK();
-            std::cout << "[" << g_block.id << "] s:COMPLETE" <<
-                " cycles:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
-                " time:"    << format_seconds(global.block[g_block.id].time.count()).num << 
+            std::cout << "[" << g_block.id << "] COMPLETE" <<
+                " [c:"  << format_long(global.block[g_block.id].cycles).num << format_long(global.block[g_block.id].cycles).symbol <<
+                " t:"    << format_seconds(global.block[g_block.id].time.count()).num << 
                 format_seconds(global.block[g_block.id].time.count()).symbol <<
-                " cps:"     << format_long(cps).num << format_long(cps).symbol << "\n";
+                " cps:"     << format_long(cps).num << format_long(cps).symbol << "]\n";
 
             rmw.Stat();
 
