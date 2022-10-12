@@ -1625,8 +1625,9 @@ loophead:
             global.cycles += global.block[g_block.id].cycles;
 
             if (global.G_CLEAR) {
-                // clear screen
-                int r = std::system("clear");
+                if (!std::system("clear")) {
+                    std::cout << "!Error clearing screen!";
+                }
             }
 
             tag.BLOCK();
