@@ -116,6 +116,7 @@ public:
 	uint_fast64_t                           G_MODE;
 	bool                                    G_QUIT = 0;
 	bool                                    G_CLEAR = 0;
+	bool                                    G_BELL = 0;
 };
 
 struct S_cell_index {
@@ -1380,6 +1381,10 @@ int read_args(std::vector<std::string> args) {
 		if (args[i] == "-clear") {
 			global.G_CLEAR = 1;
 		}
+
+		if (args[i] == "-bell") {
+			global.G_BELL = 1;
+		}
 	}
 
 	if (f && s && t && m) {
@@ -1679,7 +1684,9 @@ loophead:
 	}
 	rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
-	std::cout << "\a";
+	if (global.G_BELL) {
+		std::cout << "\a";
+	}
 
 	if (global.G_QUIT) {
 		return 0;
