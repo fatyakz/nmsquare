@@ -20,6 +20,7 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <regex>
+#include <stddef.h>
 
 struct S_best {
 public:
@@ -242,8 +243,6 @@ namespace color {
 	};
 }
 
-
-
 struct S_tag {
 	std::string S_TAG;
 	std::string TAG_COLOR;
@@ -327,8 +326,6 @@ format format_commas(unsigned long long num, S_tag tag) {
 
 	uint_fast64_t n = num, count = 0;
 
-	
-
 	while (n > 0) {
 		int digit = n % 10;
 		n /= 10;
@@ -347,7 +344,7 @@ format format_commas(unsigned long long num, S_tag tag) {
 
 	oss << NUM_COLOR;
 
-	for (auto i : digits) {
+	for (auto &i : digits) {
 		oss << i;
 	}
 
@@ -378,7 +375,6 @@ color::set lcy(color::FG_LIGHT_CYAN);
 color::set def(color::FG_DEFAULT);
 
 static void TimeStamp() {
-
 	char            timestamp[50]{ 0 };
 	std::time_t     time = std::time(nullptr);
 
@@ -392,40 +388,50 @@ public:
 		tINIT.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
 		tINIT.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 		tINIT.S_TAG = "INIT ";
+
 		TimeStamp();
+
 		std::cout << tINIT.TAG_COLOR << tINIT.S_TAG << tINIT.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void START() {
 		tSTART.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
 		tSTART.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 		tSTART.S_TAG = "START";
+
 		TimeStamp();
+
 		std::cout << tSTART.TAG_COLOR << tSTART.S_TAG << tSTART.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void BLOCK() {
 		tBLOCK.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
 		tBLOCK.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
 		tBLOCK.S_TAG = "BLOCK";
+
 		TimeStamp();
+
 		std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << tBLOCK.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void PROC() {
 		tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_GRAY) + "m";
 		tPROC.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 		tPROC.S_TAG = "PROC ";
+
 		TimeStamp();
+
 		std::cout << tPROC.TAG_COLOR << tPROC.S_TAG << tPROC.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	static void NMS() {
 		tNMS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
 		tNMS.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 		tNMS.S_TAG = "[nmSquare]";
+
 		std::cout << tNMS.TAG_COLOR << tNMS.S_TAG << tNMS.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void STATS() {
 		tSTATS.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
 		tSTATS.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_YELLOW) + "m";
 		tSTATS.S_TAG = "STATS";
+
 		TimeStamp();
 		std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tSTATS.LINE_COLOR << global.var.G_COL_SPACE;
 	}
@@ -433,35 +439,45 @@ public:
 		tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
 		tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
 		tSKIP.S_TAG = "SKIP ";
+
 		TimeStamp();
+
 		std::cout << tSKIP.TAG_COLOR << tSKIP.S_TAG << tSKIP.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void READ() {
 		tREAD.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
 		tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
 		tREAD.S_TAG = "READ ";
+
 		TimeStamp();
+
 		std::cout << tREAD.TAG_COLOR << tREAD.S_TAG << tREAD.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void WRITE() {
 		tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
 		tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
 		tWRITE.S_TAG = "WRITE";
+
 		TimeStamp();
+
 		std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tWRITE.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void ERROR() {
 		tERROR.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
 		tERROR.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 		tERROR.S_TAG = "ERROR";
+
 		TimeStamp();
+
 		std::cout << tERROR.TAG_COLOR << tERROR.S_TAG << tERROR.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void LIMIT() {
 		tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_RED) + "m";
 		tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
 		tWRITE.S_TAG = "LIMIT";
+
 		TimeStamp();
+
 		std::cout << tWRITE.TAG_COLOR << tWRITE.S_TAG << tWRITE.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 };
@@ -797,6 +813,7 @@ void print_square(long long n, long long m, long long e) {
 	if (gs) { std::cout << "*"; } std::cout << g << ":";
 	if (hs) { std::cout << "*"; } std::cout << h << ":";
 	if (is) { std::cout << "*"; } std::cout << i << "\n";
+
 	std::cout << "n:" << n << " m:" << m << "\n\n";
 
 }
@@ -1112,7 +1129,6 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 		}
 	}
 
-
 	tex.lock();
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
@@ -1142,7 +1158,6 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 	global.block[start].thread[offset] = t_thread;
 	global.block[start].id = start;
 	global.block[start].state = 2;
-
 
 	if (t_thread.best.matches >= global.block[start].best.matches) {
 		global.block[start].best = t_thread.best;
@@ -1213,6 +1228,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 			m = c - e;
 
 			if (n > 0 && m > 0 && n != m) {
+
 #ifdef countvalids 
 				validnm++; 
 #endif
@@ -1239,6 +1255,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 #ifdef countvalids 
 					validai++; 
 #endif
+
 				}
 			}
 		}
@@ -1338,7 +1355,7 @@ int read_args(std::vector<std::string> args) {
 		}
 
 		if (args[i] == "-t") {
-			global.G_NUM_THREADS = stoi(args[i + 1]);
+			global.G_NUM_THREADS = stoll(args[i + 1]);
 			t = 1;
 		}
 
@@ -1353,7 +1370,7 @@ int read_args(std::vector<std::string> args) {
 		}
 
 		if (args[i] == "-m") {
-			global.G_MODE = stoi(args[i + 1]);
+			global.G_MODE = stoll(args[i + 1]);
 			m = 1;
 		}
 
@@ -1381,7 +1398,6 @@ int read_args(std::vector<std::string> args) {
 
 	return 3;
 }
-
 
 int main(int argc, char** argv)
 {
@@ -1494,8 +1510,6 @@ pending:
 		}
 	}
 
-	
-
 start:
 
 	rmw.Stat();
@@ -1513,7 +1527,6 @@ start:
 	tag.INIT();
 	std::cout << "Blocks:"; std::cin >> global.G_LIMIT;
 	
-
 	g_date = std::chrono::system_clock::now();
 	global.date = std::chrono::system_clock::to_time_t(g_date);
 
@@ -1551,7 +1564,6 @@ loophead:
 			double          predicted_seconds       = (predicted_cycles / predicted_cps) / global.G_NUM_THREADS;
 			uint_fast64_t   predicted_total_cycles  = 0;
 			double          predicted_total_seconds = 0.0f;
-
 
 			for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
 				predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1)) * global.G_NUM_THREADS;
@@ -1611,7 +1623,6 @@ loophead:
 					thr[g_thread_id].join();
 				}
 			}
-
 
 			if (global.G_CLEAR) {
 				if (!std::system("clear")) {
