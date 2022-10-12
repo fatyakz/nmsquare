@@ -304,7 +304,7 @@ format format_commas(unsigned long long num, S_tag tag) {
 
     format f;
 
-    uint_fast64_t r, n = num, count = 0;
+    uint_fast64_t n = num, count = 0;
 
     oss << NUM_COLOR;
 
