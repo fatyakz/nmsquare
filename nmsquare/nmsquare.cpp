@@ -412,7 +412,7 @@ public:
 		std::cout << tBLOCK.TAG_COLOR << tBLOCK.S_TAG << tBLOCK.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void PROC() {
-		tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_GRAY) + "m";
+		tPROC.TAG_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 		tPROC.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 		tPROC.S_TAG = "PROC ";
 
