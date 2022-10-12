@@ -20,7 +20,6 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <regex>
-#include <stack>
 
 struct S_best {
 public:
@@ -1183,7 +1182,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 }
 
 static int thr_find_from_r(long long r, long long offset, long long step) {
-    S_best ffr;
+    S_best ffr{};
     format form;
     S_thread t_thread;
 
