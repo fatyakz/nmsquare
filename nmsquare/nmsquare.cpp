@@ -115,7 +115,8 @@ public:
     uint_fast64_t                           G_NUM_THREADS;
     std::string                             G_SYSTEM_NAME;
     uint_fast64_t                           G_MODE;
-    bool                                    G_QUIT;
+    bool                                    G_QUIT = 0;
+    bool                                    G_CLEAR = 0;
 };
 
 struct S_cell_index {
@@ -1360,6 +1361,10 @@ int read_args(std::vector<std::string> args) {
         if (args[i] == "-q") {
             global.G_QUIT = 1;
         }
+
+        if (args[i] == "-clear") {
+            global.G_CLEAR = 1;
+        }
     }
 
     if (f && s && t && m) {
@@ -1557,7 +1562,7 @@ loophead:
             
             tag.BLOCK();
             std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "/" << 
-                format_commas(global.G_BLOCK_START, tBLOCK).string + format_commas(global.G_LIMIT - 1, tBLOCK).string <<
+                format_commas(global.G_BLOCK_START + global.G_LIMIT - 1, tBLOCK).string <<
                 " [avg cps:" << format_long(predicted_cps, tBLOCK).string << 
                 "(" << global.var.G_AVG_CPS_RANGE << ")]" <<
                 " [est c:" << format_long(predicted_cycles, tBLOCK).string <<
@@ -1618,6 +1623,11 @@ loophead:
             double cps = ((double)global.block[g_block.id].cycles / global.block[g_block.id].time.count()) / global.G_NUM_THREADS;
 
             global.cycles += global.block[g_block.id].cycles;
+
+            if (global.G_CLEAR) {
+                // clear screen
+                std::system("clear");
+            }
 
             tag.BLOCK();
             std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "] COMPLETE" <<
