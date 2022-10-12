@@ -20,7 +20,6 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <regex>
-#include <stddef.h>
 
 struct S_best {
 public:
@@ -446,7 +445,7 @@ public:
 	}
 	void READ() {
 		tREAD.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
-		tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
+		tREAD.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 		tREAD.S_TAG = "READ ";
 
 		TimeStamp();
@@ -455,7 +454,7 @@ public:
 	}
 	void WRITE() {
 		tWRITE.TAG_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
-		tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_YELLOW) + "m";
+		tWRITE.LINE_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 		tWRITE.S_TAG = "WRITE";
 
 		TimeStamp();
