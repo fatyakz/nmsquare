@@ -435,8 +435,8 @@ public:
 		std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tSTATS.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void SKIP() {
-		tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
-		tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
+		tSKIP.TAG_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
+		tSKIP.LINE_COLOR = "\033[" + std::to_string(color::FG_LIGHT_CYAN) + "m";
 		tSKIP.S_TAG = "SKIP ";
 
 		TimeStamp();
