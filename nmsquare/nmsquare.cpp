@@ -1626,7 +1626,7 @@ loophead:
 
             if (global.G_CLEAR) {
                 // clear screen
-                std::system("clear");
+                int r = std::system("clear");
             }
 
             tag.BLOCK();
