@@ -661,14 +661,14 @@ public:
 
             tag.STATS();
             std::cout <<
-                "t:" << format_seconds(global.time.count()).num << format_seconds(global.time.count()).symbol <<
+                "[t:" << format_seconds(global.time.count()).num << format_seconds(global.time.count()).symbol <<
                 " c:" << format_long(global.cycles).num << format_long(global.cycles).symbol <<
                 " cps:" << format_long(cps).num << format_long(cps).symbol <<
-                " b:" << global.best.matches <<
+                "] [b:" << global.best.matches <<
                 " n:" << global.best.n <<
                 " m:" << global.best.m <<
                 " e:" << global.best.e <<
-                " r:" << global.best.r << "\n";
+                " r:" << global.best.r << "]\n";
         }
     }
 };
@@ -1472,10 +1472,8 @@ loophead:
 
 
             for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
-                // calculate total cycles for all future blocks
-                predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1));// *global.G_NUM_THREADS;
-                predicted_total_seconds     += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
-                    / global.G_NUM_THREADS;
+                predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1)) * global.G_NUM_THREADS;
+                predicted_total_seconds += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE));
             }
 
             tag.BLOCK();
