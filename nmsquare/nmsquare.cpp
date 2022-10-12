@@ -1324,7 +1324,7 @@ reset:
 
     if (cmd.size() > 1) {
         std::cout << dg << "( ";
-        for (int i = 1; i < cmd.size(); ++i) {
+        for (uint_fast64_t i = 1; i < cmd.size(); ++i) {
             std::cout << cmd[i] << " ";
         }
         std::cout << ")" << def;
