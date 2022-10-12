@@ -304,7 +304,8 @@ format format_filesize(unsigned long long num, S_tag tag) {
 
 	if (num < 1024) { f.num = num; f.symbol = "b"; }
 	if (num > 1024 && num < 1048576) { f.num = num / 1024.0f; f.symbol = "kb"; }
-	if (num > 1048576) { f.num = num / 1048576.0f; f.symbol = "mb"; }
+	if (num > 1048576 && num < 1099511627776) { f.num = num / 1048576.0f; f.symbol = "mb"; }
+	if (num > 1099511627776) { f.num = num / 1099511627776.0f; f.symbol = "gb"; }
 
 	oss.setf(std::ios::fixed, std::ios::floatfield);
 	oss.precision(global.var.G_PRECISION);
