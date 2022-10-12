@@ -1560,6 +1560,12 @@ loophead:
                     / global.G_NUM_THREADS;
             }
             
+            if (global.G_CLEAR) {
+                if (!std::system("clear")) {
+                    std::cout << "!Error clearing screen!";
+                }
+            }
+
             tag.BLOCK();
             std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "/" << 
                 format_commas(global.G_BLOCK_START + global.G_LIMIT - 1, tBLOCK).string <<
@@ -1623,12 +1629,6 @@ loophead:
             double cps = ((double)global.block[g_block.id].cycles / global.block[g_block.id].time.count()) / global.G_NUM_THREADS;
 
             global.cycles += global.block[g_block.id].cycles;
-
-            if (global.G_CLEAR) {
-                if (!std::system("clear")) {
-                    std::cout << "!Error clearing screen!";
-                }
-            }
 
             tag.BLOCK();
             std::cout << "[" << format_commas(g_block.id, tBLOCK).string << "] COMPLETE" <<
