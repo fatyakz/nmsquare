@@ -253,8 +253,8 @@ struct S_tag {
 format format_seconds(long double num, S_tag tag) {
     std::ostringstream oss;
 
-    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
-    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 
     format f;
 
@@ -274,8 +274,8 @@ format format_seconds(long double num, S_tag tag) {
 format format_long(unsigned long long num, S_tag tag) {
     std::ostringstream oss;
 
-    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_LIGHT_BLUE) + "m";
-    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string NUM_COLOR = "\033[" + std::to_string(color::FG_DEFAULT) + "m";
+    std::string SYM_COLOR = "\033[" + std::to_string(color::FG_DARK_GRAY) + "m";
 
     format f;
 
