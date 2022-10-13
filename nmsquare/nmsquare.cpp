@@ -1137,9 +1137,10 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
+	//cycles = ((e * e * e * e) / 2) / threadcount;
 	cycles = ((e * e * e * e) / 2) / threadcount;
 
-	cycles /= global.var.T_CYCLES_DIVIDER;
+	//cycles /= global.var.T_CYCLES_DIVIDER;
 
 	double cps = (double)cycles / t_time.count();
 
@@ -1281,7 +1282,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 	auto t_date = std::chrono::system_clock::now();
 	t_thread.date = std::chrono::system_clock::to_time_t(t_date);
 
-	t_thread.cycles = ((r + r) - 1) * ((r + r) - 1);
+	t_thread.cycles = (((r + r) - 1) * ((r + r) - 1)) / step;
 
 	global.block[r].cycles += t_thread.cycles;
 	global.block[r].thread[offset] = t_thread;
@@ -1319,7 +1320,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 	tag.PROC();
 	std::cout <<
 		"[r:" << format::commas(global.block[r].thread[offset].id, tPROC).string << t_offset_spacer << "+" << offset << "]" <<
-		" cps:" << format::bignum(cps, tPROC).string <<
+		" cps:" << std::setw(6) << format::bignum(cps, tPROC).string <<
 		" t:" << format::seconds(global.block[r].thread[offset].time.count(), tPROC).string <<
 		" b:" << format::commas(global.block[r].thread[offset].best.matches, tPROC).string <<
 		" n:" << std::setw(global.var.G_MIN_WIDTH_NM) << format::commas(global.block[r].thread[offset].best.n, tPROC).string <<
@@ -1568,7 +1569,7 @@ loophead:
 
 			uint_fast64_t   predicted_cycles        = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1)) * global.G_NUM_THREADS;
 			double          predicted_cps           = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
-			double          predictedseconds       = (predicted_cycles / predicted_cps) / global.G_NUM_THREADS;
+			double          predicted_seconds       = (predicted_cycles / predicted_cps) / global.G_NUM_THREADS;
 			uint_fast64_t   predicted_total_cycles  = 0;
 			double          predicted_totalseconds = 0.0f;
 
@@ -1585,7 +1586,7 @@ loophead:
 				"(" << global.var.G_AVG_CPS_RANGE << ")]" <<
 				" [est c:" << format::bignum(predicted_cycles, tBLOCK).string <<
 				"/" << format::bignum(predicted_total_cycles, tBLOCK).string <<
-				" t:" << format::seconds(predictedseconds, tBLOCK).string <<
+				" t:" << format::seconds(predicted_seconds, tBLOCK).string <<
 				"/" << format::seconds(predicted_totalseconds, tBLOCK).string <<
 				"] PENDING...\n";
 
@@ -1644,7 +1645,7 @@ loophead:
 				global.best = global.block[g_block.id].best;
 			}
 
-			double cps = ((double)global.block[g_block.id].cycles / global.block[g_block.id].time.count()) / global.G_NUM_THREADS;
+			double cps = ((double)global.block[g_block.id].cycles / global.block[g_block.id].time.count());
 
 			global.cycles += global.block[g_block.id].cycles;
 
