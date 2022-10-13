@@ -542,7 +542,7 @@ public:
 
 		if (t_cycles > 0 && t_time.count() > 0) {
 
-			t_cps = ((double)t_cycles / t_time.count()) / global.G_NUM_THREADS;
+			t_cps = ((double)t_cycles / t_time.count());// / global.G_NUM_THREADS;
 		}
 
 		return t_cps;
