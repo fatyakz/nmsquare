@@ -1538,8 +1538,8 @@ start:
 	global.date = std::chrono::system_clock::to_time_t(g_date);
 
 	tag.START();
-	std::cout << "[" << global.G_BLOCK_START << "] -> ["
-		<< global.G_BLOCK_START + global.G_LIMIT - 1 << "]\n";
+	std::cout << "[" << format::commas(global.G_BLOCK_START, tSTART).string << "] -> ["
+		<< format::commas(global.G_BLOCK_START + global.G_LIMIT - 1).string << "]\n";
 
 loophead:
 
@@ -1562,7 +1562,7 @@ loophead:
 			global.block[g_block.id].state = 1;
 			global.block[g_block.id].system_name = global.G_SYSTEM_NAME;
 			global.rmw.rmw_writemode =
-				"[s:" + std::to_string(global.block[g_block.id].state) + " id:" + std::to_string(g_block.id) + " (" + global.G_SYSTEM_NAME + ")]";
+				"[s:" + std::to_string(global.block[g_block.id].state) + " id:" + format::commas(g_block.id, tWRITE).string + " (" + global.G_SYSTEM_NAME + ")]";
 
 			rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
 
