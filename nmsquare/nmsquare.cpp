@@ -542,7 +542,7 @@ public:
 
 		if (t_cycles > 0 && t_time.count() > 0) {
 
-			t_cps = ((double)t_cycles / t_time.count());// / global.G_NUM_THREADS;
+			t_cps = ((double)t_cycles / t_time.count()) / global.G_NUM_THREADS;
 		}
 
 		return t_cps;
@@ -1137,10 +1137,9 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
-	//cycles = ((e * e * e * e) / 2) / threadcount;
 	cycles = ((e * e * e * e) / 2) / threadcount;
 
-	//cycles /= global.var.T_CYCLES_DIVIDER;
+	cycles /= global.var.T_CYCLES_DIVIDER;
 
 	double cps = (double)cycles / t_time.count();
 
