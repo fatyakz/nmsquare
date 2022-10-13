@@ -1539,7 +1539,7 @@ start:
 
 	tag.START();
 	std::cout << "[" << format::commas(global.G_BLOCK_START, tSTART).string << "] -> ["
-		<< format::commas(global.G_BLOCK_START + global.G_LIMIT - 1).string << "]\n";
+		<< format::commas(global.G_BLOCK_START + global.G_LIMIT - 1, tSTART).string << "]\n";
 
 loophead:
 
