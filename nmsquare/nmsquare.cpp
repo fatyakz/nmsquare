@@ -1221,8 +1221,8 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 
 	std::chrono::high_resolution_clock::time_point ffr1 = std::chrono::high_resolution_clock::now();
 
-	for (long long fn = 1; fn < rlimit; fn += step) {
-		for (long long fm = 1; fm < rlimit; fm++) {
+	for (long long fn = offset; fn < rlimit; fn += step) {
+		for (long long fm = offset; fm < rlimit; fm += step) {
 
 			a = fn * fn;
 			c = fm * fm;
