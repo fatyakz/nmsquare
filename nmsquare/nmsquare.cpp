@@ -730,7 +730,7 @@ public:
 
 			tag.READ();
 			std::cout <<
-				"[<-" << global.rmw.rmw_reads << "]" <<
+				"[<-" << format::commas(global.rmw.rmw_reads, tREAD).num << "]" <<
 				" blocks:" << format::commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
 				" size:" << format::filesize(global.rmw.rmw_file_size, tREAD).string << 
 				" complete:" << format::commas(global.rmw.rmw_completed, tREAD).string <<
