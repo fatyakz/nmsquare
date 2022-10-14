@@ -730,7 +730,7 @@ public:
 
 			tag.READ();
 			std::cout <<
-				"[<-" << format::commas(global.rmw.rmw_reads, tREAD).num << "]" <<
+				"[<-" << format::commas(global.rmw.rmw_reads, tREAD).string << "]" <<
 				" blocks:" << format::commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
 				" size:" << format::filesize(global.rmw.rmw_file_size, tREAD).string << 
 				" complete:" << format::commas(global.rmw.rmw_completed, tREAD).string <<
@@ -1675,12 +1675,12 @@ loophead:
 		else {
 			if (global.block[id].state == 1) {
 				tag.SKIP();
-				std::cout << "[" << id << "] PENDING  ("
+				std::cout << "[" << format::commas(id, tSKIP).string << "] PENDING  ("
 					<< global.block[id].system_name << "), skipping...\n" << def;
 			}
 			if (global.block[id].state == 2) {
 				tag.SKIP();
-				std::cout << "[" << id << "] COMPLETE ("
+				std::cout << "[" << format::commas(id, tSKIP).string << "] COMPLETE ("
 					<< global.block[id].system_name << "), skipping...\n" << def;
 			}
 		}
