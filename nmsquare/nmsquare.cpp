@@ -1281,7 +1281,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 	auto t_date = std::chrono::system_clock::now();
 	t_thread.date = std::chrono::system_clock::to_time_t(t_date);
 
-	t_thread.cycles = (((r + r) - 1) * ((r + r) - 1)) / step;
+	t_thread.cycles = (((r + r) - 1) * ((r + r) - 1)) / global.G_NUM_THREADS;
 
 	global.block[r].cycles += t_thread.cycles;
 	global.block[r].thread[offset] = t_thread;
