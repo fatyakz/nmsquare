@@ -1581,9 +1581,9 @@ loophead:
 
 			for (uint_fast64_t i = g_block.id; i < (g_block.id + global.G_LIMIT); i++) {
 				predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1));
-				predicted_totalseconds += (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
-					/ global.G_NUM_THREADS;
 			}
+			predicted_totalseconds = (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
+				/ global.G_NUM_THREADS;
 
 			tag.BLOCK();
 			std::cout << "[" << format::commas(g_block.id, tBLOCK).string << "/" << 
