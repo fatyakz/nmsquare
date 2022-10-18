@@ -114,9 +114,11 @@ public:
 	uint_fast64_t                           G_NUM_THREADS;
 	std::string                             G_SYSTEM_NAME;
 	uint_fast64_t                           G_MODE;
+	
 	bool                                    G_QUIT = 0;
 	bool                                    G_CLEAR = 0;
 	bool                                    G_BELL = 0;
+	bool									G_NOFILE = 0;
 };
 
 struct S_cell_index {
@@ -691,6 +693,7 @@ public:
 		return read_rmw;
 	}
 	static void ReadMergeWrite(std::string path) {
+		if (global.G_NOFILE) { return; }
 
 		global.rmw = ReadFromFile(path, file.block);
 
@@ -1388,6 +1391,10 @@ int read_args(std::vector<std::string> args) {
 
 		if (args[i] == "-bell") {
 			global.G_BELL = 1;
+		}
+
+		if (args[i] == "-nofile") {
+			global.G_NOFILE = 1;
 		}
 	}
 
