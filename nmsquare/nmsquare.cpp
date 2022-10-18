@@ -1585,6 +1585,9 @@ loophead:
 			predicted_totalseconds = (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
 				/ global.G_NUM_THREADS;
 
+			double previous_cps = global.block[g_block.id - 1].cycles / global.block[g_block.id - 1].time.count();
+			predicted_totalseconds = predicted_total_cycles / previous_cps;
+
 			tag.BLOCK();
 			std::cout << "[" << format::commas(g_block.id, tBLOCK).string << "/" << 
 				format::commas(global.G_BLOCK_START + global.G_LIMIT - 1, tBLOCK).string <<
