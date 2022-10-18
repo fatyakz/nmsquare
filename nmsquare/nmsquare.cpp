@@ -693,7 +693,6 @@ public:
 		return read_rmw;
 	}
 	static void ReadMergeWrite(std::string path) {
-		if (global.G_NOFILE) { return; }
 
 		global.rmw = ReadFromFile(path, file.block);
 
@@ -1394,7 +1393,7 @@ int read_args(std::vector<std::string> args) {
 		}
 
 		if (args[i] == "-nofile") {
-			global.G_NOFILE = 1;
+			global.G_NOFILE = 0;
 		}
 	}
 
@@ -1559,7 +1558,7 @@ loophead:
 
 		if (global.block.size() < (id + 1)) { global.block.resize(id+1); }
 
-		rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
+		if (!global.G_NOFILE) { rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH); }
 		
 		rmw.Stat();
 
@@ -1572,7 +1571,7 @@ loophead:
 			global.rmw.rmw_writemode =
 				"[s:" + std::to_string(global.block[g_block.id].state) + " id:" + format::commas(g_block.id, tWRITE).string + " (" + global.G_SYSTEM_NAME + ")]";
 
-			rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH);
+			if (!global.G_NOFILE) { rmw.ReadMergeWrite(global.G_BLOCK_FILE_PATH); }
 
 			uint_fast64_t   predicted_cycles        = (((g_block.id + g_block.id) - 1) * ((g_block.id + g_block.id) - 1));
 			double          predicted_cps           = rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE);
