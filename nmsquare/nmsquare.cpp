@@ -439,6 +439,7 @@ public:
 		tSTATS.S_TAG = "STATS";
 
 		TimeStamp();
+
 		std::cout << tSTATS.TAG_COLOR << tSTATS.S_TAG << tSTATS.LINE_COLOR << global.var.G_COL_SPACE;
 	}
 	void SKIP() {
@@ -732,12 +733,13 @@ public:
 
 			tag.READ();
 			std::cout <<
-				"[<-" << format::commas(global.rmw.rmw_reads, tREAD).string << "]" <<
-				" blocks:" << format::commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
-				" size:" << format::filesize(global.rmw.rmw_file_size, tREAD).string << 
-				" complete:" << format::commas(global.rmw.rmw_completed, tREAD).string <<
-				" pending:" << format::commas(global.rmw.rmw_pending, tREAD).string <<
-				" incomplete:" << format::commas(global.rmw.rmw_incomplete - 1, tREAD).string << "\n";
+				"[<-" <<			format::commas(global.rmw.rmw_reads, tREAD).string << "]" <<
+				" blocks:" <<		format::commas(global.rmw.rmw_file_blocks - 1, tREAD).string <<
+				" size:" <<			format::filesize(global.rmw.rmw_file_size, tREAD).string << 
+				" complete:" <<		format::commas(global.rmw.rmw_completed, tREAD).string <<
+				" pending:" <<		format::commas(global.rmw.rmw_pending, tREAD).string <<
+				" incomplete:" <<	format::commas(global.rmw.rmw_incomplete - 1, tREAD).string << 
+				"\n";
 		}
 
 		if (global.rmw.rmw_writes > 0) {
@@ -764,14 +766,15 @@ public:
 
 			tag.STATS();
 			std::cout <<
-				"[t:" << format::seconds(global.time.count(), tSTATS).string <<
-				" c:" << format::bignum(global.cycles, tSTATS).string <<
-				" cps:" << format::bignum(cps, tSTATS).string <<
-				"] [b:" << format::commas(global.best.matches, tSTATS).string <<
-				" n:" << format::commas(global.best.n, tSTATS).string <<
-				" m:" << format::commas(global.best.m, tSTATS).string <<
-				" e:" << format::commas(global.best.e, tSTATS).string <<
-				" r:" << format::commas(global.best.r, tSTATS).string << "]\n";
+				"[t:" <<	format::seconds(global.time.count(), tSTATS).string <<
+				" c:" <<	format::bignum(global.cycles, tSTATS).string <<
+				" cps:" <<	format::bignum(cps, tSTATS).string <<
+				"] [b:" <<	format::commas(global.best.matches, tSTATS).string <<
+				" n:" <<	format::commas(global.best.n, tSTATS).string <<
+				" m:" <<	format::commas(global.best.m, tSTATS).string <<
+				" e:" <<	format::commas(global.best.e, tSTATS).string <<
+				" r:" <<	format::commas(global.best.r, tSTATS).string << 
+				"]\n";
 		}
 	}
 };
@@ -929,14 +932,14 @@ static S_thread thr_Single(uint_fast64_t t_E, uint_fast64_t t_offset, uint_fast6
 
 		tag.PROC();
 		std::cout << 
-			"[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
-			" cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
-			" c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-			" t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
-			" b:" << global.block[t_E].thread[t_offset].best.matches <<
-			" n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
-			" m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
-			" e:" << global.block[t_E].thread[t_offset].best.e <<
+			"[r:" <<	global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+			" cps:" <<	std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+			" c:" <<	std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+			" t:" <<	std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+			" b:" <<	global.block[t_E].thread[t_offset].best.matches <<
+			" n:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
+			" m:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
+			" e:" <<	global.block[t_E].thread[t_offset].best.e <<
 			"\n";
 
 	mlock.unlock();
@@ -1062,15 +1065,15 @@ end:
 		}
 
 		TimeStamp();
-		std::cout << "PROC " << global.var.G_COL_SPACE << 
-			"[r:" << global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
-			" cps:" << std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
-			" c:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
-			" t:" << std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
-			" b:" << global.block[t_E].thread[t_offset].best.matches <<
-			" n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
-			" m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
-			" e:" << global.block[t_E].thread[t_offset].best.e <<
+		std::cout <<	"PROC " << global.var.G_COL_SPACE << 
+			"[r:" <<	global.block[t_E].thread[t_offset].id << t_offset_spacer << "+" << t_offset << "]" <<
+			" cps:" <<	std::setw(global.var.G_MIN_WIDTH) << cps / global.var.B_CYCLES_DIVIDER << global.var.B_CYCLES_SYMBOL <<
+			" c:" <<	std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].cycles << global.var.T_CYCLES_SYMBOL <<
+			" t:" <<	std::setw(global.var.G_MIN_WIDTH) << global.block[t_E].thread[t_offset].time.count() << global.var.T_TIME_SYMBOL <<
+			" b:" <<	global.block[t_E].thread[t_offset].best.matches <<
+			" n:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.n <<
+			" m:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[t_E].thread[t_offset].best.m <<
+			" e:" <<	global.block[t_E].thread[t_offset].best.e <<
 			"\n";
 
 	mlock.unlock();
@@ -1187,15 +1190,15 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 	}
 
 	TimeStamp();
-	std::cout << "PROC " << global.var.G_COL_SPACE <<
-		"[r:" << global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
-		" cps:" << std::setw(global.var.G_MIN_WIDTH) << format::bignum(cps, tPROC).string <<
-		" c:" << std::setw(global.var.G_MIN_WIDTH) << format::bignum(global.block[start].thread[offset].cycles, tPROC).string <<
-		" t:" << std::setw(global.var.G_MIN_WIDTH) << format::seconds(global.block[start].thread[offset].time.count(), tPROC).string <<
-		" b:" << global.block[start].thread[offset].best.matches <<
-		" n:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.n <<
-		" m:" << std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
-		" e:" << global.block[start].thread[offset].best.e <<
+	std::cout <<	"PROC " << global.var.G_COL_SPACE <<
+		"[r:" <<	global.block[start].thread[offset].id << t_offset_spacer << "+" << offset << "]" <<
+		" cps:" <<	std::setw(global.var.G_MIN_WIDTH) <<	format::bignum(cps, tPROC).string <<
+		" c:" <<	std::setw(global.var.G_MIN_WIDTH) <<	format::bignum(global.block[start].thread[offset].cycles, tPROC).string <<
+		" t:" <<	std::setw(global.var.G_MIN_WIDTH) <<	format::seconds(global.block[start].thread[offset].time.count(), tPROC).string <<
+		" b:" <<											global.block[start].thread[offset].best.matches <<
+		" n:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.n <<
+		" m:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << global.block[start].thread[offset].best.m <<
+		" e:" <<											global.block[start].thread[offset].best.e <<
 		"\n";
 
 	tex.unlock();
@@ -1321,14 +1324,14 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 
 	tag.PROC();
 	std::cout <<
-		"[r:" << format::commas(global.block[r].thread[offset].id, tPROC).string << t_offset_spacer << "+" << offset << "]" <<
-		" cps:" << std::setw(6) << format::bignum(cps, tPROC).string <<
-		" t:" << format::seconds(global.block[r].thread[offset].time.count(), tPROC).string <<
-		" b:" << format::commas(global.block[r].thread[offset].best.matches, tPROC).string <<
-		" n:" << std::setw(global.var.G_MIN_WIDTH_NM) << format::commas(global.block[r].thread[offset].best.n, tPROC).string <<
-		" m:" << std::setw(global.var.G_MIN_WIDTH_NM) << format::commas(global.block[r].thread[offset].best.m, tPROC).string <<
-		" e:" << format::commas(global.block[r].thread[offset].best.e, tPROC).string <<
-		" (" << std::setw(global.var.G_MIN_WIDTH) << format::bignum(global.block[r].thread[offset].best.e, tPROC).string << ")" <<
+		"[r:" <<											format::commas(global.block[r].thread[offset].id, tPROC).string << t_offset_spacer << "+" << offset << "]" <<
+		" cps:" <<	std::setw(6) <<							format::bignum(cps, tPROC).string <<
+		" t:" <<											format::seconds(global.block[r].thread[offset].time.count(), tPROC).string <<
+		" b:" <<											format::commas(global.block[r].thread[offset].best.matches, tPROC).string <<
+		" n:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << format::commas(global.block[r].thread[offset].best.n, tPROC).string <<
+		" m:" <<	std::setw(global.var.G_MIN_WIDTH_NM) << format::commas(global.block[r].thread[offset].best.m, tPROC).string <<
+		" e:" <<											format::commas(global.block[r].thread[offset].best.e, tPROC).string <<
+		" (" <<		std::setw(global.var.G_MIN_WIDTH) <<	format::bignum(global.block[r].thread[offset].best.e, tPROC).string << ")" <<
 		"\n";
 
 	mlock.unlock();
@@ -1579,7 +1582,7 @@ loophead:
 			uint_fast64_t   predicted_total_cycles  = 0;
 			double          predicted_totalseconds  = 0.0f;
 
-			for (uint_fast64_t i = g_block.id; i < (g_block.id + global.G_LIMIT); i++) {
+			for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT); i++) {
 				predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1));
 			}
 			predicted_totalseconds = (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
@@ -1589,14 +1592,14 @@ loophead:
 			predicted_totalseconds = predicted_total_cycles / previous_cps;
 
 			tag.BLOCK();
-			std::cout << "[" << format::commas(g_block.id, tBLOCK).string << "/" << 
-				format::commas(global.G_BLOCK_START + global.G_LIMIT - 1, tBLOCK).string <<
-				" [avg cps:" << format::bignum(predicted_cps, tBLOCK).string << 
-				"(" << global.var.G_AVG_CPS_RANGE << ")]" <<
-				" [est c:" << format::bignum(predicted_cycles, tBLOCK).string <<
-				"/" << format::bignum(predicted_total_cycles, tBLOCK).string <<
-				" t:" << format::seconds(predicted_seconds, tBLOCK).string <<
-				"/" << format::seconds(predicted_totalseconds, tBLOCK).string <<
+			std::cout << "[" <<		format::commas(g_block.id, tBLOCK).string << "/" << 
+									format::commas(global.G_BLOCK_START + global.G_LIMIT - 1, tBLOCK).string <<
+				" [avg cps:" <<		format::bignum(predicted_cps, tBLOCK).string << 
+				"(" <<				global.var.G_AVG_CPS_RANGE << ")]" <<
+				" [est c:" <<		format::bignum(predicted_cycles, tBLOCK).string <<
+				"/" <<				format::bignum(predicted_total_cycles, tBLOCK).string <<
+				" t:" <<			format::seconds(predicted_seconds, tBLOCK).string <<
+				"/" <<				format::seconds(predicted_totalseconds, tBLOCK).string <<
 				"] PENDING...\n";
 
 			global.block[g_block.id].thread.resize(global.G_NUM_THREADS);
@@ -1660,9 +1663,9 @@ loophead:
 
 			tag.BLOCK();
 			std::cout << "[" << format::commas(g_block.id, tBLOCK).string << "] COMPLETE" <<
-				" [c:"  << format::bignum(global.block[g_block.id].cycles, tBLOCK).string <<
-				" t:"    << format::seconds(global.block[g_block.id].time.count(), tBLOCK).string <<
-				" cps:"     << format::bignum(cps, tBLOCK).string << "]\n";
+				" [c:"  <<		format::bignum(global.block[g_block.id].cycles, tBLOCK).string <<
+				" t:"    <<		format::seconds(global.block[g_block.id].time.count(), tBLOCK).string <<
+				" cps:"     <<	format::bignum(cps, tBLOCK).string << "]\n";
 
 			rmw.Stat();
 
