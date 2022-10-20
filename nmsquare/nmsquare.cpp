@@ -1582,7 +1582,7 @@ loophead:
 			uint_fast64_t   predicted_total_cycles  = 0;
 			double          predicted_totalseconds  = 0.0f;
 
-			for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT); i++) {
+			for (uint_fast64_t i = g_block.id; i < global.G_BLOCK_START + global.G_LIMIT; i++) {
 				predicted_total_cycles += (((i + i) - 1) * ((i + i) - 1));
 			}
 			predicted_totalseconds = (predicted_total_cycles / rmw.GetAverageCPS(global.G_SYSTEM_NAME, global.var.G_AVG_CPS_RANGE))
