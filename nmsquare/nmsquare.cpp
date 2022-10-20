@@ -1566,6 +1566,9 @@ loophead:
 		rmw.Stat();
 
 		if (file.block[id].state == 0) {
+
+			std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
+
 			S_block g_block;
 			g_block.id = id;
 
@@ -1607,7 +1610,7 @@ loophead:
 			auto b_date = std::chrono::system_clock::now();
 			global.block[g_block.id].date = std::chrono::system_clock::to_time_t(b_date);
 
-			std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
+			
 
 			std::vector<std::thread> thr(global.G_NUM_THREADS);
 
