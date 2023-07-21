@@ -1158,7 +1158,7 @@ static S_thread  thr_nms2(uint_fast32_t start, uint_fast32_t offset, uint_fast32
 	t_thread.best.r = start;
 	t_thread.id = start;
 	t_thread.time = t_time;
-	auto t_date = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point t_date = std::chrono::system_clock::now();
 	t_thread.date = std::chrono::system_clock::to_time_t(t_date);
 	t_thread.cycles = cycles;
 
@@ -1284,7 +1284,7 @@ static int thr_find_from_r(long long r, long long offset, long long step) {
 	t_thread.best.r = r;
 	t_thread.id = r;
 	t_thread.time = t_time;
-	auto t_date = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point t_date = std::chrono::system_clock::now();
 	t_thread.date = std::chrono::system_clock::to_time_t(t_date);
 
 	t_thread.cycles = ((((r + r) - 1) * ((r + r) - 1))) / global.G_NUM_THREADS;
